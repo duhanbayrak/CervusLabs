@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cervus Labs - Services</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Manrope:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#111827", // Deep charcoal/black
+                        "background-light": "#EFF1F4", // Specific light gray request
+                        "background-dark": "#0B0F15", // Deep charcoal almost black
+                        "card-light": "rgba(255, 255, 255, 0.7)",
+                        "card-dark": "rgba(30, 41, 59, 0.4)",
+                    },
+                    fontFamily: {
+                        display: ["Manrope", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    letterSpacing: {
+                        widest: '.25em',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'draw': 'draw 3s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        draw: {
+                            from: { strokeDashoffset: 1000 },
+                            to: { strokeDashoffset: 0 }
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+<style>
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4B5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280;
+        }
+        .glass {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .network-grid {
+             background-image: 
+                linear-gradient(rgba(17, 24, 39, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(17, 24, 39, 0.03) 1px, transparent 1px);
+             background-size: 50px 50px;
+        }
+        .dark .network-grid {
+             background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+        .animate-draw path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 font-body transition-colors duration-300 antialiased selection:bg-gray-300 selection:text-black dark:selection:bg-gray-700 dark:selection:text-white">
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-background-light dark:bg-[#0B0F15] transition-colors duration-300">
+<div class="absolute inset-0 network-grid [mask-image:radial-gradient(ellipse_70%_70%_at_50%_50%,#000_30%,transparent_100%)]"></div>
+<div class="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] opacity-[0.03] dark:opacity-[0.05] pointer-events-none rotate-12">
+<svg class="w-full h-full text-primary dark:text-white" fill="currentColor" viewBox="0 0 200 200">
+<path d="M100 170L85 140H115L100 170Z"></path>
+<path d="M85 140L75 110L100 100L125 110L115 140"></path>
+<path d="M75 110L55 105L65 130L85 140"></path>
+<path d="M125 110L145 105L135 130L115 140"></path>
+<path d="M75 110L70 90L100 100L130 90L125 110"></path>
+<path d="M70 90L60 70L40 70L40 50"></path>
+<path d="M60 70L80 50L80 30"></path>
+<path d="M80 50L60 40"></path>
+<path d="M130 90L140 70L160 70L160 50"></path>
+<path d="M140 70L120 50L120 30"></path>
+<path d="M120 50L140 40"></path>
+</svg>
+</div>
+<div class="absolute top-1/3 left-1/4 w-0.5 h-0.5 bg-primary dark:bg-white rounded-full opacity-50 animate-float" style="animation-delay: 0.5s;"></div>
+<div class="absolute bottom-1/3 right-1/5 w-1 h-1 bg-primary dark:bg-white rounded-full opacity-30 animate-float" style="animation-delay: 2.5s;"></div>
+</div>
+<nav class="fixed top-0 w-full z-50 transition-all duration-300 border-b border-gray-200/50 dark:border-white/5 glass bg-background-light/80 dark:bg-background-dark/80">
+<div class="max-w-7xl mx-auto px-6 lg:px-8">
+<div class="flex items-center justify-between h-20">
+<div class="flex-shrink-0 cursor-pointer group">
+<span class="font-display font-bold text-lg tracking-[0.2em] text-primary dark:text-white group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                    CERVUS<span class="font-light">LABS</span>
+</span>
+</div>
+<div class="hidden md:block">
+<div class="ml-10 flex items-baseline space-x-12">
+<a class="text-sm font-medium tracking-wide text-primary dark:text-white border-b-2 border-primary dark:border-white pb-1 transition-colors" href="#">SERVICES</a>
+<a class="text-sm font-medium tracking-wide text-gray-700 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors" href="#">CASE STUDIES</a>
+<a class="text-sm font-medium tracking-wide text-gray-700 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors" href="#">ABOUT</a>
+<a class="text-sm font-medium tracking-wide text-gray-700 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors" href="#">CONTACT</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors focus:outline-none" id="theme-toggle">
+<span class="material-symbols-outlined text-xl dark:hidden">dark_mode</span>
+<span class="material-symbols-outlined text-xl hidden dark:block">light_mode</span>
+</button>
+<button class="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-300 hover:text-primary focus:outline-none">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<section class="relative z-10 pt-48 pb-16 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
+<div class="max-w-4xl mx-auto relative">
+<h1 class="text-5xl md:text-6xl lg:text-7xl font-display font-light tracking-[0.1em] text-primary dark:text-white mb-8">
+            INTELLIGENT SOLUTIONS
+        </h1>
+<div class="w-24 h-1 bg-primary dark:bg-white mx-auto mb-12 opacity-80"></div>
+<p class="text-xl md:text-2xl font-body font-light text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
+            Engineering the digital nervous systems of tomorrow's enterprises.
+        </p>
+</div>
+</section>
+<section class="relative z-10 py-24 border-t border-gray-200 dark:border-gray-800/50">
+<div class="absolute left-[-15%] top-1/4 w-[600px] h-[600px] opacity-[0.02] dark:opacity-[0.04] pointer-events-none -rotate-12">
+<svg class="w-full h-full text-primary dark:text-white" fill="currentColor" viewBox="0 0 200 200">
+<path d="M100 170L85 140H115L100 170Z"></path>
+<path d="M85 140L75 110L100 100L125 110L115 140"></path>
+<path d="M75 110L55 105L65 130L85 140"></path>
+<path d="M125 110L145 105L135 130L115 140"></path>
+</svg>
+</div>
+<div class="max-w-7xl mx-auto px-6 lg:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+<div class="order-2 lg:order-1">
+<div class="flex items-center gap-4 mb-6">
+<div class="p-3 bg-white dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10 shadow-sm">
+<span class="material-symbols-outlined text-3xl text-primary dark:text-white">precision_manufacturing</span>
+</div>
+<span class="text-sm font-mono uppercase tracking-widest text-gray-500">Service 01</span>
+</div>
+<h2 class="text-4xl font-display font-semibold text-primary dark:text-white mb-6">Custom Automation</h2>
+<p class="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                    We dismantle inefficiency. By integrating Robotic Process Automation (RPA) and custom scripting into your legacy architecture, we create seamless, self-regulating workflows that operate with mathematical precision.
+                </p>
+<ul class="space-y-4 mb-8">
+<li class="flex items-start">
+<span class="material-symbols-outlined text-primary dark:text-white mr-3 mt-1 text-sm">check_circle</span>
+<span class="text-gray-700 dark:text-gray-300">End-to-end Workflow Optimization</span>
+</li>
+<li class="flex items-start">
+<span class="material-symbols-outlined text-primary dark:text-white mr-3 mt-1 text-sm">check_circle</span>
+<span class="text-gray-700 dark:text-gray-300">Robotic Process Automation (RPA)</span>
+</li>
+<li class="flex items-start">
+<span class="material-symbols-outlined text-primary dark:text-white mr-3 mt-1 text-sm">check_circle</span>
+<span class="text-gray-700 dark:text-gray-300">Legacy System Integration &amp; Modernization</span>
+</li>
+</ul>
+</div>
+<div class="order-1 lg:order-2 relative h-96 w-full bg-white dark:bg-background-dark/50 border border-gray-200 dark:border-white/5 rounded-xl flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 network-grid opacity-50"></div>
+<svg class="w-64 h-64 text-primary dark:text-white opacity-80 animate-draw" fill="none" viewBox="0 0 200 200">
+<g stroke="currentColor" stroke-linecap="round" stroke-width="1.5">
+<rect height="40" rx="4" width="40" x="40" y="40"></rect>
+<rect height="40" rx="4" width="40" x="120" y="40"></rect>
+<rect height="40" rx="4" width="40" x="80" y="120"></rect>
+<path d="M60 80 L 60 100 L 100 100 L 100 120"></path>
+<path d="M140 80 L 140 100 L 100 100"></path>
+<circle cx="100" cy="100" fill="currentColor" r="4"></circle>
+<path d="M100 160 L 100 180" stroke-dasharray="4 4"></path>
+</g>
+</svg>
+</div>
+</div>
+</div>
+</section>
+<section class="relative z-10 py-24 bg-white/50 dark:bg-white/5 border-y border-gray-200 dark:border-gray-800/50 backdrop-blur-sm">
+<div class="absolute right-[-15%] top-1/3 w-[600px] h-[600px] opacity-[0.02] dark:opacity-[0.04] pointer-events-none rotate-45">
+<svg class="w-full h-full text-primary dark:text-white" fill="currentColor" viewBox="0 0 200 200">
+<path d="M100 170L85 140H115L100 170Z"></path>
+<path d="M85 140L75 110L100 100L125 110L115 140"></path>
+<path d="M75 110L55 105L65 130L85 140"></path>
+</svg>
+</div>
+<div class="max-w-7xl mx-auto px-6 lg:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+<div class="relative h-96 w-full bg-background-light dark:bg-background-dark border border-gray-200 dark:border-white/5 rounded-xl flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-transparent to-primary/5 dark:to-white/5"></div>
+<svg class="w-64 h-64 text-primary dark:text-white opacity-80 animate-draw" fill="none" viewBox="0 0 200 200">
+<g stroke="currentColor" stroke-width="1.5">
+<circle cx="100" cy="100" r="30" stroke-opacity="0.3"></circle>
+<circle cx="100" cy="100" r="50" stroke-opacity="0.1"></circle>
+<path d="M100 70 L 100 40"></path>
+<path d="M100 130 L 100 160"></path>
+<path d="M70 100 L 40 100"></path>
+<path d="M130 100 L 160 100"></path>
+<circle cx="100" cy="40" fill="currentColor" r="3"></circle>
+<circle cx="100" cy="160" fill="currentColor" r="3"></circle>
+<circle cx="40" cy="100" fill="currentColor" r="3"></circle>
+<circle cx="160" cy="100" fill="currentColor" r="3"></circle>
+<path d="M78 78 L 60 60"></path>
+<path d="M122 78 L 140 60"></path>
+<path d="M78 122 L 60 140"></path>
+<path d="M122 122 L 140 140"></path>
+<circle cx="60" cy="60" fill="currentColor" r="2"></circle>
+<circle cx="140" cy="60" fill="currentColor" r="2"></circle>
+<circle cx="60" cy="140" fill="currentColor" r="2"></circle>
+<circle cx="140" cy="140" fill="currentColor" r="2"></circle>
+</g>
+</svg>
+</div>
+<div>
+<div class="flex items-center gap-4 mb-6">
+<div class="p-3 bg-white dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10 shadow-sm">
+<span class="material-symbols-outlined text-3xl text-primary dark:text-white">neurology</span>
+</div>
+<span class="text-sm font-mono uppercase tracking-widest text-gray-500">Service 02</span>
+</div>
+<h2 class="text-4xl font-display font-semibold text-primary dark:text-white mb-6">AI &amp; Machine Learning</h2>
+<p class="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                    Data without intelligence is noise. We deploy predictive modeling and neural networks to extract actionable signals from your data lakes, transforming raw information into strategic foresight.
+                </p>
+<ul class="space-y-4 mb-8">
+<li class="flex items-start">
+<span class="material-symbols-outlined text-primary dark:text-white mr-3 mt-1 text-sm">check_circle</span>
+<span class="text-gray-700 dark:text-gray-300">Predictive Modeling &amp; Forecasting</span>
+</li>
+<li class="flex items-start">
+<span class="material-symbols-outlined text-primary dark:text-white mr-3 mt-1 text-sm">check_circle</span>
+<span class="text-gray-700 dark:text-gray-300">Intelligent Data Processing (IDP)</span>
+</li>
+<li class="flex items-start">
+<span class="material-symbols-outlined text-primary dark:text-white mr-3 mt-1 text-sm">check_circle</span>
+<span class="text-gray-700 dark:text-gray-300">Natural Language Understanding</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section class="relative z-10 py-24">
+<div class="absolute left-[-5%] bottom-0 w-[500px] h-[500px] opacity-[0.02] dark:opacity-[0.04] pointer-events-none -rotate-90">
+<svg class="w-full h-full text-primary dark:text-white" fill="currentColor" viewBox="0 0 200 200">
+<path d="M100 170L85 140H115L100 170Z"></path>
+<path d="M75 110L55 105L65 130L85 140"></path>
+</svg>
+</div>
+<div class="max-w-7xl mx-auto px-6 lg:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+<div class="order-2 lg:order-1">
+<div class="flex items-center gap-4 mb-6">
+<div class="p-3 bg-white dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10 shadow-sm">
+<span class="material-symbols-outlined text-3xl text-primary dark:text-white">dns</span>
+</div>
+<span class="text-sm font-mono uppercase tracking-widest text-gray-500">Service 03</span>
+</div>
+<h2 class="text-4xl font-display font-semibold text-primary dark:text-white mb-6">Enterprise Software</h2>
+<p class="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                    Scalability is non-negotiable. We architect cloud-native applications designed to handle enterprise loads. Our solutions are modular, resilient, and built to grow organically alongside your business.
+                </p>
+<ul class="space-y-4 mb-8">
+<li class="flex items-start">
+<span class="material-symbols-outlined text-primary dark:text-white mr-3 mt-1 text-sm">check_circle</span>
+<span class="text-gray-700 dark:text-gray-300">Cloud-Native Architecture</span>
+</li>
+<li class="flex items-start">
+<span class="material-symbols-outlined text-primary dark:text-white mr-3 mt-1 text-sm">check_circle</span>
+<span class="text-gray-700 dark:text-gray-300">Microservices &amp; API Development</span>
+</li>
+<li class="flex items-start">
+<span class="material-symbols-outlined text-primary dark:text-white mr-3 mt-1 text-sm">check_circle</span>
+<span class="text-gray-700 dark:text-gray-300">High-Availability Systems</span>
+</li>
+</ul>
+</div>
+<div class="order-1 lg:order-2 relative h-96 w-full bg-white dark:bg-background-dark/50 border border-gray-200 dark:border-white/5 rounded-xl flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 network-grid opacity-30"></div>
+<svg class="w-64 h-64 text-primary dark:text-white opacity-80 animate-draw" fill="none" viewBox="0 0 200 200">
+<g stroke="currentColor" stroke-width="1.5">
+<path d="M50 140 L 150 140 L 170 120 L 70 120 Z"></path>
+<path d="M50 110 L 150 110 L 170 90 L 70 90 Z"></path>
+<path d="M50 80 L 150 80 L 170 60 L 70 60 Z"></path>
+<line x1="50" x2="50" y1="140" y2="80"></line>
+<line x1="150" x2="150" y1="140" y2="80"></line>
+<line x1="170" x2="170" y1="120" y2="60"></line>
+<circle cx="80" cy="130" fill="currentColor" r="2"></circle>
+<circle cx="90" cy="130" fill="currentColor" r="2"></circle>
+<circle cx="80" cy="100" fill="currentColor" r="2"></circle>
+<circle cx="80" cy="70" fill="currentColor" r="2"></circle>
+</g>
+</svg>
+</div>
+</div>
+</div>
+</section>
+<section class="relative z-10 py-32 bg-white dark:bg-background-dark border-t border-gray-200 dark:border-gray-800">
+<div class="max-w-7xl mx-auto px-6 lg:px-8">
+<div class="text-center mb-24">
+<h2 class="text-3xl md:text-4xl font-display font-light text-primary dark:text-white tracking-[0.15em] uppercase">How We Work</h2>
+</div>
+<div class="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="hidden lg:block absolute top-12 left-0 w-full h-0.5 bg-gray-200 dark:bg-white/10 z-0"></div>
+<div class="relative z-10 group">
+<div class="w-24 h-24 mx-auto bg-background-light dark:bg-background-dark border-2 border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:border-primary dark:group-hover:border-white transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl text-gray-400 group-hover:text-primary dark:group-hover:text-white transition-colors">search</span>
+</div>
+<div class="text-center">
+<h3 class="text-xl font-display font-bold text-primary dark:text-white mb-3">Discovery</h3>
+<p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed px-4">
+                        We map your current ecosystem, identifying bottlenecks and defining the parameters of success.
+                    </p>
+</div>
+</div>
+<div class="relative z-10 group">
+<div class="w-24 h-24 mx-auto bg-background-light dark:bg-background-dark border-2 border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:border-primary dark:group-hover:border-white transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl text-gray-400 group-hover:text-primary dark:group-hover:text-white transition-colors">architecture</span>
+</div>
+<div class="text-center">
+<h3 class="text-xl font-display font-bold text-primary dark:text-white mb-3">Strategy</h3>
+<p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed px-4">
+                        Architecting the solution. We design the logic branching and select the optimal tech stack.
+                    </p>
+</div>
+</div>
+<div class="relative z-10 group">
+<div class="w-24 h-24 mx-auto bg-background-light dark:bg-background-dark border-2 border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:border-primary dark:group-hover:border-white transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl text-gray-400 group-hover:text-primary dark:group-hover:text-white transition-colors">code</span>
+</div>
+<div class="text-center">
+<h3 class="text-xl font-display font-bold text-primary dark:text-white mb-3">Implementation</h3>
+<p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed px-4">
+                        Agile development with rigorous testing. We build, refine, and deploy with minimal disruption.
+                    </p>
+</div>
+</div>
+<div class="relative z-10 group">
+<div class="w-24 h-24 mx-auto bg-background-light dark:bg-background-dark border-2 border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center mb-8 group-hover:border-primary dark:group-hover:border-white transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl text-gray-400 group-hover:text-primary dark:group-hover:text-white transition-colors">trending_up</span>
+</div>
+<div class="text-center">
+<h3 class="text-xl font-display font-bold text-primary dark:text-white mb-3">Growth</h3>
+<p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed px-4">
+                        Deployment is just the beginning. We monitor, optimize, and scale as your data evolves.
+                    </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="relative z-10 py-32 bg-primary text-white overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+<div class="absolute inset-0 network-grid [mask-image:linear-gradient(to_bottom,transparent,black)]"></div>
+</div>
+<div class="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-20">
+<h2 class="text-4xl md:text-5xl font-display font-light tracking-tight mb-8">
+            Start Your Transformation
+        </h2>
+<p class="text-lg text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Ready to evolve your enterprise? Let's discuss how Cervus Labs can engineer your future.
+        </p>
+<button class="px-10 py-4 bg-white text-primary font-display font-bold tracking-widest text-sm uppercase hover:bg-gray-200 transition-colors duration-300 rounded-sm">
+            Schedule Consultation
+        </button>
+</div>
+</section>
+<footer class="relative z-10 py-12 border-t border-gray-200 dark:border-gray-800 bg-background-light dark:bg-background-dark">
+<div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+<div class="mb-4 md:mb-0">
+<span class="font-display font-bold text-sm tracking-[0.2em] text-primary dark:text-white">
+                CERVUS<span class="font-light">LABS</span>
+</span>
+<p class="text-xs text-gray-500 mt-2">© 2023 Cervus Labs Inc. All rights reserved.</p>
+</div>
+<div class="flex space-x-6 text-xs text-gray-500 uppercase tracking-wider">
+<a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Terms</a>
+<a class="hover:text-primary dark:hover:text-white transition-colors" href="#">Sitemap</a>
+</div>
+</div>
+</footer>
+<script>
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const htmlElement = document.documentElement;
+    // Check local storage or system preference
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        htmlElement.classList.add('dark');
+    } else {
+        htmlElement.classList.remove('dark');
+    }
+    themeToggleBtn.addEventListener('click', function() {
+        if (htmlElement.classList.contains('dark')) {
+            htmlElement.classList.remove('dark');
+            localStorage.setItem('color-theme', 'light');
+        } else {
+            htmlElement.classList.add('dark');
+            localStorage.setItem('color-theme', 'dark');
+        }
+    });
+</script>
+
+</body></html>
