@@ -21,6 +21,81 @@ export const tr = {
     terms: "Şartlar",
     sitemap: "Site Haritası",
   },
+  privacy: {
+    title: "Gizlilik Politikası",
+    lastUpdated: "Son Güncelleme",
+    sections: {
+      introduction: {
+        title: "Giriş",
+        content:
+          "Cervus Labs, gizliliğinize saygı gösterir ve kişisel verilerinizi korumaya kararlıdır. Bu gizlilik politikası, web sitemizi ziyaret ettiğinizde veya hizmetlerimizi kullandığınızda bilgilerinizi nasıl topladığımızı, kullandığımızı ve koruduğumuzu açıklar.",
+      },
+      dataCollection: {
+        title: "Topladığımız Veriler",
+        content:
+          "İletişim formumuzu doldurduğunuzda doğrudan bize sağladığınız bilgileri topluyoruz; adınız, e-posta adresiniz, şirket adınız ve proje detaylarınız dahil. Ayrıca cihazınız ve web sitemizle nasıl etkileşim kurduğunuz hakkında belirli bilgileri otomatik olarak topluyoruz.",
+      },
+      dataUse: {
+        title: "Verilerinizi Nasıl Kullanıyoruz",
+        content:
+          "Topladığımız bilgileri, sorularınıza yanıt vermek, hizmetlerimizi sağlamak, web sitemizi iyileştirmek ve hizmetlerimiz hakkında sizinle iletişim kurmak için kullanıyoruz. Kişisel bilgilerinizi üçüncü taraflarla pazarlama amaçları için satmıyor veya paylaşmıyoruz.",
+      },
+      dataSecurity: {
+        title: "Veri Güvenliği",
+        content:
+          "Kişisel verilerinizi yetkisiz erişime, değişikliğe, ifşaya veya yok edilmeye karşı korumak için uygun teknik ve organizasyonel önlemler uyguluyoruz.",
+      },
+      contact: {
+        title: "Bize Ulaşın",
+        content:
+          "Bu Gizlilik Politikası hakkında herhangi bir sorunuz varsa, lütfen hello@cervuslabs.com adresinden bizimle iletişime geçin.",
+      },
+    },
+  },
+  terms: {
+    title: "Hizmet Şartları",
+    lastUpdated: "Son Güncelleme",
+    sections: {
+      agreement: {
+        title: "Şartları Kabul Etme",
+        content:
+          "Cervus Labs web sitesine erişerek ve kullanarak, bu anlaşmanın şartlarını ve hükümlerini kabul etmiş ve bunlara bağlı olmayı kabul etmiş olursunuz.",
+      },
+      services: {
+        title: "Hizmetler",
+        content:
+          "Cervus Labs, iş akışı otomasyonu ve SaaS geliştirme hizmetleri sağlar. Tüm hizmetler, her projeye özel ayrı hizmet anlaşmalarına ve şartlarına tabidir.",
+      },
+      intellectualProperty: {
+        title: "Fikri Mülkiyet",
+        content:
+          "Bu web sitesindeki tüm içerik, metin, grafikler, logolar ve yazılım dahil olmak üzere Cervus Labs'in mülkiyetindedir ve telif hakkı ve diğer fikri mülkiyet yasalarıyla korunmaktadır.",
+      },
+      limitations: {
+        title: "Sorumluluk Sınırlamaları",
+        content:
+          "Cervus Labs, web sitesini kullanmanızdan veya kullanamamanızdan kaynaklanan dolaylı, arızi, özel, sonuçsal veya cezai zararlardan sorumlu olmayacaktır.",
+      },
+      changes: {
+        title: "Şartlardaki Değişiklikler",
+        content:
+          "Bu şartları istediğimiz zaman değiştirme hakkını saklı tutarız. Herhangi bir değişiklikten sonra web sitesini kullanmaya devam etmeniz, yeni şartları kabul ettiğiniz anlamına gelir.",
+      },
+    },
+  },
+  sitemap: {
+    title: "Site Haritası",
+    description: "Web sitemizin tüm sayfaları ve bölümlerinde gezinin.",
+    pages: {
+      home: "Ana Sayfa",
+      services: "Hizmetler",
+      caseStudies: "Projeler",
+      about: "Hakkımızda",
+      contact: "İletişim",
+      privacy: "Gizlilik Politikası",
+      terms: "Hizmet Şartları",
+    },
+  },
   contact: {
     hero: {
       tag: "Proje Başlat",
@@ -34,7 +109,7 @@ export const tr = {
       followUs: "Bizi Takip Edin",
     },
     form: {
-      title: "Proje Sorgusu",
+      title: "İletişim Formu",
       name: "İsim",
       email: "E-posta",
       company: "Şirket",
@@ -43,8 +118,10 @@ export const tr = {
       emailPlaceholder: "ahmet@ornek.com",
       companyPlaceholder: "Örnek Lojistik",
       briefPlaceholder: "Çözmeye çalıştığınız problemi bize anlatın...",
-      sendInquiry: "Sorgu Gönder",
+      sendInquiry: "Mesaj Gönder",
       sending: "Gönderiliyor...",
+      successMessage: "Mesaj başarıyla gönderildi! En kısa sürede size dönüş yapacağız.",
+      errorMessage: "Mesaj gönderilemedi. Lütfen tekrar deneyin.",
     },
     section: {
       title: "Bir sonraki adımı tasarlamaya hazır mısınız?",
@@ -63,21 +140,102 @@ export const tr = {
   projects: {
     flowSync: {
       title: "FlowSync Platform",
+      slug: "flow-sync",
       description:
         "n8n ile inşa edilmiş kurumsal iş akışı otomasyon platformu. CRM, ERP ve iletişim araçlarını sorunsuz otomatik süreçlere bağlar.",
       category: "OTOMASYON",
+      challenge: {
+        title: "Zorluk",
+        description:
+          "Büyük bir işletme, birden fazla departman arasında iş akışlarını otomatikleştirmek istiyordu, ancak mevcut sistemleri izole durumdaydı ve platformlar arası veri senkronizasyonu için manuel müdahale gerekiyordu.",
+      },
+      solution: {
+        title: "Çözüm",
+        description:
+          "CRM, ERP ve iletişim araçlarını birbirine bağlayan kapsamlı bir n8n tabanlı otomasyon platformu olan FlowSync'i geliştirdik. Platform, görsel iş akışı oluşturmayı mümkün kılarak karmaşık kodlama ihtiyacını ortadan kaldırırken kurumsal düzeyde güvenlik ve ölçeklenebilirlik sağlar.",
+        features: [
+          "Her departman için özel n8n iş akışları",
+          "Platformlar arası gerçek zamanlı veri senkronizasyonu",
+          "Otomatik raporlama ve analitik",
+          "Rol tabanlı erişim kontrolü",
+        ],
+      },
+      metrics: {
+        timeSaved: "%75",
+        workflowsActive: "50+",
+        efficiencyGain: "3x",
+      },
+      technologies: ["n8n", "PostgreSQL", "REST API'ler", "Node.js"],
     },
     taskFlow: {
       title: "TaskFlow SaaS",
+      slug: "task-flow",
       description:
         "Gerçek zamanlı işbirliği, otomatik görev yönlendirme ve akıllı kaynak tahsisi ile bulut tabanlı proje yönetimi SaaS'ı.",
       category: "SAAS",
+      challenge: {
+        title: "Zorluk",
+        description:
+          "Ekipler, gerçek zamanlı işbirliği ve akıllı otomasyon eksikliği olan parçalanmış proje yönetim araçlarıyla mücadele ediyordu. Büyüyen ihtiyaçlarıyla birlikte ölçeklenebilen birleşik bir platforma ihtiyaçları vardı.",
+      },
+      solution: {
+        title: "Çözüm",
+        description:
+          "TaskFlow SaaS, sıfırdan bulut tabanlı bir çözüm olarak inşa edildi. Gerçek zamanlı işbirliği, iş yükü ve uzmanlığa dayalı otomatik görev yönlendirme ve makine öğrenmesi algoritmaları kullanarak akıllı kaynak tahsisini birleştirir.",
+        features: [
+          "Gerçek zamanlı işbirlikçi çalışma alanı",
+          "AI destekli görev atama",
+          "Otomatik iş akışı tetikleyicileri",
+          "Kapsamlı analitik kontrol paneli",
+        ],
+      },
+      metrics: {
+        timeSaved: "%60",
+        workflowsActive: "30+",
+        efficiencyGain: "2.5x",
+      },
+      technologies: ["Node.js", "PostgreSQL", "WebSockets", "React"],
     },
     dataBridge: {
       title: "DataBridge Automation",
+      slug: "data-bridge",
       description:
         "Birden fazla veritabanı, API ve bulut servislerini otomatik hata yönetimi ve izleme ile bağlayan n8n destekli veri senkronizasyon sistemi.",
       category: "ENTEGRASYON",
+      challenge: {
+        title: "Zorluk",
+        description:
+          "Birden fazla veri kaynağına sahip bir organizasyon, manuel müdahale olmadan sorunsuz senkronizasyona ihtiyaç duyuyordu. Veri tutarsızlıkları ve senkronizasyon hataları operasyonel gecikmelere neden oluyordu.",
+      },
+      solution: {
+        title: "Çözüm",
+        description:
+          "DataBridge Automation, birden fazla veritabanı, API ve bulut servisi arasında sağlam veri boru hatları oluşturmak için n8n kullanır. Sistem, otomatik hata yönetimi, yeniden deneme mekanizmaları ve kapsamlı izleme panelleri içerir.",
+        features: [
+          "Çoklu veritabanı senkronizasyonu",
+          "Otomatik hata kurtarma",
+          "Gerçek zamanlı izleme ve uyarılar",
+          "Veri doğrulama ve dönüşüm",
+        ],
+      },
+      metrics: {
+        timeSaved: "%80",
+        workflowsActive: "40+",
+        efficiencyGain: "4x",
+      },
+      technologies: ["n8n", "PostgreSQL", "REST API'ler", "MongoDB"],
+    },
+  },
+  projectDetail: {
+    backToCaseStudies: "Projelere Dön",
+    timeSaved: "Tasarruf Edilen Zaman",
+    activeWorkflows: "Aktif İş Akışları",
+    efficiencyGain: "Verimlilik Artışı",
+    technologiesUsed: "Kullanılan Teknolojiler",
+    cta: {
+      title: "Projenize Başlamaya Hazır mısınız?",
+      description: "Benzer sonuçlara ulaşmanıza nasıl yardımcı olabileceğimizi tartışalım.",
+      button: "İletişime Geçin",
     },
   },
   services: {

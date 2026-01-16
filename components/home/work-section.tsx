@@ -15,6 +15,7 @@ export function WorkSection() {
       description: t.projects.flowSync.description,
       category: t.projects.flowSync.category,
       year: "2024",
+      slug: t.projects.flowSync.slug,
       imageUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuCglXgSeOwZt32ZYsWaT78YBQ6GRn9uyZXqMnxrGZ4qv9SeAqKgVaPiRT3CIUQegOEIuvtWWEctkv5mpPWwzz97lIiUTJfknf1coL4e-Bo5_bwCpeDLS88rimEXI-3wCVn83mNHjLuLnovruUHDzCaTKkkd1ggwQX_At5nLmtCFsvFLX1iKTYfWvMXcISL5QUAU4OJ-kWC2-RF5SuaRKb5gpDJswgRij3TLpBV37i3F9xpP2Ps-7A-jDT2fZ0aOo2pZpX3NlQTYkKnz",
       imageAlt: "Workflow Automation Dashboard",
@@ -24,6 +25,7 @@ export function WorkSection() {
       description: t.projects.taskFlow.description,
       category: t.projects.taskFlow.category,
       year: "2024",
+      slug: t.projects.taskFlow.slug,
       imageUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuBqJCeH0pXGDLZLo8iOfnGUxw5-UlYOmIlrvORLVVdc-JScytyC9-a4o-yD5yDb3YWKsnIWMgeIP-qGEEFdxro2O8eGBvnOP9r1mKsz3x9uUKeYwCKxcuxrRYFZ45kWzzoL6ZVlHqRN-jRvX9_WUM-qmAYNCeTBowbHb1mZyihIJsc2tFUKqiUl8JmgmD5f8a7152JSAcfUmqqSyw3yUtc8Z_N_2dPJgdjJRdPvod1v-ESgo4Z-PFRMrFNQfchLG-TvT5byXLWIJCPI",
       imageAlt: "SaaS Application Interface",
@@ -33,6 +35,7 @@ export function WorkSection() {
       description: t.projects.dataBridge.description,
       category: t.projects.dataBridge.category,
       year: "2023",
+      slug: t.projects.dataBridge.slug,
       imageUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuC_wq2bysXtQEqDeZ368XAWtd_Vczv5DuVvm8iOy3lHo8V_r5KWzIOFR1V3bgEDAjzmafZdYIsg7PUzPQENVjhI4lDEAhAXRAPmR647Ux-8BjLNNwkmeqh4di-wiuVWo40Q1-iWucaouGnv1OCjCtNPeqjVPKC1krdf5na9xfuhfU6NdbusTTfgpH-or4yfLzWF2ZrDRvB0EZfZ-_44xOWQMucfvub_ZHZI04RaW9u_VYpeugkjpFpzXl4Prtyd5_oFOiQ0GkkWRtyf",
       imageAlt: "Data Integration Workflow",
@@ -57,7 +60,7 @@ export function WorkSection() {
                 </p>
               </div>
               <Link
-                href="#"
+                href="/case-studies"
                 className="hidden md:flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors mt-4 md:mt-0"
               >
                 {t.work.viewArchive} <ArrowRight className="w-4 h-4" />
@@ -76,7 +79,7 @@ export function WorkSection() {
           <SectionTransition delay={0.5}>
             <div className="mt-8 text-center md:hidden">
               <Link
-                href="#"
+                href="/case-studies"
                 className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors"
               >
                 {t.work.viewArchive} <ArrowRight className="w-4 h-4" />

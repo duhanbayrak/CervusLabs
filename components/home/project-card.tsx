@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export interface ProjectCardProps {
   title: string;
@@ -7,6 +8,7 @@ export interface ProjectCardProps {
   year: string;
   imageUrl: string;
   imageAlt: string;
+  slug?: string;
 }
 
 export function ProjectCard({
@@ -16,9 +18,10 @@ export function ProjectCard({
   year,
   imageUrl,
   imageAlt,
+  slug,
 }: ProjectCardProps) {
-  return (
-    <div className="group relative rounded-xl overflow-hidden glass bg-card-light dark:bg-card-dark border border-white/40 dark:border-white/5 hover:border-primary/20 dark:hover:border-white/20 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1">
+  const content = (
+    <div className="group relative rounded-xl overflow-hidden glass bg-card-light dark:bg-card-dark border border-white/40 dark:border-white/5 hover:border-primary/20 dark:hover:border-white/20 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 cursor-pointer">
       <div className="aspect-video overflow-hidden bg-gray-200 dark:bg-gray-900 relative">
         <Image
           src={imageUrl}
@@ -43,4 +46,14 @@ export function ProjectCard({
       </div>
     </div>
   );
+
+  if (slug) {
+    return (
+      <Link href={`/case-studies/${slug}`} className="block">
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
 }

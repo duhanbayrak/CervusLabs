@@ -21,6 +21,81 @@ export const en = {
     terms: "Terms",
     sitemap: "Sitemap",
   },
+  privacy: {
+    title: "Privacy Policy",
+    lastUpdated: "Last Updated",
+    sections: {
+      introduction: {
+        title: "Introduction",
+        content:
+          "Cervus Labs respects your privacy and is committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you visit our website or use our services.",
+      },
+      dataCollection: {
+        title: "Data We Collect",
+        content:
+          "We collect information that you provide directly to us, such as when you fill out our contact form, including your name, email address, company name, and project details. We also automatically collect certain information about your device and how you interact with our website.",
+      },
+      dataUse: {
+        title: "How We Use Your Data",
+        content:
+          "We use the information we collect to respond to your inquiries, provide our services, improve our website, and communicate with you about our services. We do not sell or share your personal information with third parties for their marketing purposes.",
+      },
+      dataSecurity: {
+        title: "Data Security",
+        content:
+          "We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction.",
+      },
+      contact: {
+        title: "Contact Us",
+        content:
+          "If you have any questions about this Privacy Policy, please contact us at hello@cervuslabs.com.",
+      },
+    },
+  },
+  terms: {
+    title: "Terms of Service",
+    lastUpdated: "Last Updated",
+    sections: {
+      agreement: {
+        title: "Agreement to Terms",
+        content:
+          "By accessing and using the Cervus Labs website, you accept and agree to be bound by the terms and provision of this agreement.",
+      },
+      services: {
+        title: "Services",
+        content:
+          "Cervus Labs provides workflow automation and SaaS development services. All services are subject to separate service agreements and terms specific to each project.",
+      },
+      intellectualProperty: {
+        title: "Intellectual Property",
+        content:
+          "All content on this website, including text, graphics, logos, and software, is the property of Cervus Labs and is protected by copyright and other intellectual property laws.",
+      },
+      limitations: {
+        title: "Limitations of Liability",
+        content:
+          "Cervus Labs shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the website.",
+      },
+      changes: {
+        title: "Changes to Terms",
+        content:
+          "We reserve the right to modify these terms at any time. Your continued use of the website after any changes constitutes your acceptance of the new terms.",
+      },
+    },
+  },
+  sitemap: {
+    title: "Sitemap",
+    description: "Navigate through all pages and sections of our website.",
+    pages: {
+      home: "Home",
+      services: "Services",
+      caseStudies: "Case Studies",
+      about: "About",
+      contact: "Contact",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
+    },
+  },
   contact: {
     hero: {
       tag: "Start a Project",
@@ -34,7 +109,7 @@ export const en = {
       followUs: "Follow Us",
     },
     form: {
-      title: "Project Inquiry",
+      title: "Contact Form",
       name: "Name",
       email: "Email",
       company: "Company",
@@ -43,8 +118,10 @@ export const en = {
       emailPlaceholder: "jane@example.com",
       companyPlaceholder: "Acme Logistics",
       briefPlaceholder: "Tell us about the problem you're trying to solve...",
-      sendInquiry: "Send Inquiry",
+      sendInquiry: "Send Message",
       sending: "Sending...",
+      successMessage: "Message sent successfully! We'll get back to you soon.",
+      errorMessage: "Failed to send message. Please try again.",
     },
     section: {
       title: "Ready to engineer the next step?",
@@ -63,21 +140,102 @@ export const en = {
   projects: {
     flowSync: {
       title: "FlowSync Platform",
+      slug: "flow-sync",
       description:
         "Enterprise workflow automation platform built with n8n, connecting CRM, ERP, and communication tools into seamless automated processes.",
       category: "AUTOMATION",
+      challenge: {
+        title: "The Challenge",
+        description:
+          "A large enterprise needed to automate workflows across multiple departments, but their existing systems were siloed and required manual intervention for cross-platform data synchronization.",
+      },
+      solution: {
+        title: "The Solution",
+        description:
+          "We built FlowSync, a comprehensive n8n-based automation platform that connects CRM, ERP, and communication tools. The platform enables visual workflow creation, eliminating the need for complex coding while maintaining enterprise-grade security and scalability.",
+        features: [
+          "Custom n8n workflows for each department",
+          "Real-time data synchronization across platforms",
+          "Automated reporting and analytics",
+          "Role-based access control",
+        ],
+      },
+      metrics: {
+        timeSaved: "75%",
+        workflowsActive: "50+",
+        efficiencyGain: "3x",
+      },
+      technologies: ["n8n", "PostgreSQL", "REST APIs", "Node.js"],
     },
     taskFlow: {
       title: "TaskFlow SaaS",
+      slug: "task-flow",
       description:
         "Cloud-native project management SaaS with real-time collaboration, automated task routing, and intelligent resource allocation.",
       category: "SAAS",
+      challenge: {
+        title: "The Challenge",
+        description:
+          "Teams were struggling with fragmented project management tools that lacked real-time collaboration and intelligent automation. They needed a unified platform that could scale with their growing needs.",
+      },
+      solution: {
+        title: "The Solution",
+        description:
+          "TaskFlow SaaS was built from the ground up as a cloud-native solution. It combines real-time collaboration, automated task routing based on workload and expertise, and intelligent resource allocation using machine learning algorithms.",
+        features: [
+          "Real-time collaborative workspace",
+          "AI-powered task assignment",
+          "Automated workflow triggers",
+          "Comprehensive analytics dashboard",
+        ],
+      },
+      metrics: {
+        timeSaved: "60%",
+        workflowsActive: "30+",
+        efficiencyGain: "2.5x",
+      },
+      technologies: ["Node.js", "PostgreSQL", "WebSockets", "React"],
     },
     dataBridge: {
       title: "DataBridge Automation",
+      slug: "data-bridge",
       description:
         "n8n-powered data synchronization system connecting multiple databases, APIs, and cloud services with automated error handling and monitoring.",
       category: "INTEGRATION",
+      challenge: {
+        title: "The Challenge",
+        description:
+          "An organization with multiple data sources needed seamless synchronization without manual intervention. Data inconsistencies and synchronization failures were causing operational delays.",
+      },
+      solution: {
+        title: "The Solution",
+        description:
+          "DataBridge Automation uses n8n to create robust data pipelines between multiple databases, APIs, and cloud services. The system includes automated error handling, retry mechanisms, and comprehensive monitoring dashboards.",
+        features: [
+          "Multi-database synchronization",
+          "Automated error recovery",
+          "Real-time monitoring and alerts",
+          "Data validation and transformation",
+        ],
+      },
+      metrics: {
+        timeSaved: "80%",
+        workflowsActive: "40+",
+        efficiencyGain: "4x",
+      },
+      technologies: ["n8n", "PostgreSQL", "REST APIs", "MongoDB"],
+    },
+  },
+  projectDetail: {
+    backToCaseStudies: "Back to Case Studies",
+    timeSaved: "Time Saved",
+    activeWorkflows: "Active Workflows",
+    efficiencyGain: "Efficiency Gain",
+    technologiesUsed: "Technologies Used",
+    cta: {
+      title: "Ready to Start Your Project?",
+      description: "Let's discuss how we can help you achieve similar results.",
+      button: "Get in Touch",
     },
   },
   services: {

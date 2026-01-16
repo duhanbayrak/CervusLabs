@@ -16,19 +16,19 @@ export function Footer() {
         </div>
         <div className="flex space-x-6 text-xs text-gray-500 uppercase tracking-wider">
           <Link
-            href="#"
+            href="/privacy"
             className="hover:text-primary dark:hover:text-white transition-colors"
           >
             {t.footer.privacy}
           </Link>
           <Link
-            href="#"
+            href="/terms"
             className="hover:text-primary dark:hover:text-white transition-colors"
           >
             {t.footer.terms}
           </Link>
           <Link
-            href="#"
+            href="/sitemap"
             className="hover:text-primary dark:hover:text-white transition-colors"
           >
             {t.footer.sitemap}
