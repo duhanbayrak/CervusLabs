@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Moon, Sun, Menu } from "lucide-react";
+import { Moon, Sun, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/language-context";
 import { LanguageSwitcher } from "./language-switcher";
@@ -11,12 +11,18 @@ import { LanguageSwitcher } from "./language-switcher";
 export function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { t } = useLanguage();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    // Close mobile menu when route changes
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   const isAboutPage = pathname === "/about";
   const isServicesPage = pathname === "/services";
@@ -85,13 +91,48 @@ export function Navbar() {
                     </button>
                   )}
                   <button
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     className="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-300 hover:text-primary focus:outline-none"
                     aria-label="Menu"
                   >
-                    <Menu className="w-6 h-6" />
+                    {isMobileMenuOpen ? (
+                      <X className="w-6 h-6" />
+                    ) : (
+                      <Menu className="w-6 h-6" />
+                    )}
                   </button>
                 </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-200/50 dark:border-white/5">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              {navLinks.map((link) => {
+                const isActive =
+                  (link.href === "/services" && isServicesPage) ||
+                  (link.href === "/case-studies" && isCaseStudiesPage) ||
+                  (link.href === "/about" && isAboutPage) ||
+                  (link.href === "/contact" && isContactPage);
+
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                      isActive
+                        ? "text-primary dark:text-white bg-gray-100 dark:bg-gray-800"
+                        : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
