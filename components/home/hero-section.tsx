@@ -4,81 +4,212 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/language-context";
+import { useState, useEffect, useRef } from "react";
+import { AntlerMouseEffect } from "@/components/ui/AntlerMouseEffect";
 
 export function HeroSection() {
   const { t } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number; duration: number }>>([]);
+  const mousePositionRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    setMounted(true);
+    // Generate particles only on client side - optimized count (reduced from 50 to 30)
+    const particleData = Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 5,
+      duration: Math.random() * 10 + 5,
+    }));
+    setParticles(particleData);
+  }, []);
+
+  // Branching lines from antlers - Minimalist optimized version
+  // Reduced to essential branches only
+  const branchingLines = [
+    // Left antler branches - Key points only
+    { id: 1, startX: 40, startY: 50, endX: 20, endY: 30, delay: 0 },
+    { id: 2, startX: 40, startY: 50, endX: 10, endY: 60, delay: 0.3 },
+    { id: 3, startX: 60, startY: 40, endX: 30, endY: 20, delay: 0.2 },
+    { id: 4, startX: 60, startY: 40, endX: 80, endY: 15, delay: 0.4 },
+    { id: 5, startX: 80, startY: 30, endX: 70, endY: 10, delay: 0.5 },
+    // Right antler branches - Key points only
+    { id: 6, startX: 140, startY: 40, endX: 170, endY: 20, delay: 0.2 },
+    { id: 7, startX: 140, startY: 40, endX: 120, endY: 15, delay: 0.4 },
+    { id: 8, startX: 160, startY: 50, endX: 190, endY: 60, delay: 0.3 },
+    { id: 9, startX: 160, startY: 50, endX: 180, endY: 30, delay: 0.5 },
+    { id: 10, startX: 120, startY: 30, endX: 130, endY: 10, delay: 0.6 },
+  ];
+
   return (
-    <section className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
-      {/* Network SVG Background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-[1400px] pointer-events-none -z-10">
-        <svg
-          className="w-full h-full text-gray-300 dark:text-white/10 opacity-60 animate-network-pulse"
-          fill="none"
-          preserveAspectRatio="xMidYMid slice"
-          viewBox="0 0 1000 800"
-        >
-          <g stroke="currentColor" strokeWidth="0.5">
-            <path d="M500 400 L 100 100" strokeDasharray="4 4" />
-            <path d="M500 400 L 900 100" strokeDasharray="4 4" />
-            <path d="M500 400 L 100 700" strokeDasharray="4 4" />
-            <path d="M500 400 L 900 700" strokeDasharray="4 4" />
-            <path d="M500 400 L 500 100" opacity="0.5" />
-            <path d="M500 400 L 200 400" opacity="0.5" />
-            <path d="M500 400 L 800 400" opacity="0.5" />
-            <path d="M300 300 L 700 300" opacity="0.3" />
-            <path
-              d="M200 400 L 300 200 L 700 200 L 800 400"
-              fill="none"
-              opacity="0.2"
-            />
-            <circle cx="500" cy="400" fill="none" r="150" strokeOpacity="0.2" />
-            <circle
-              cx="500"
-              cy="400"
-              fill="none"
-              r="280"
-              strokeDasharray="10 10"
-              strokeOpacity="0.1"
-            />
-          </g>
-          <circle
-            className="animate-pulse"
-            cx="300"
-            cy="300"
-            fill="currentColor"
-            r="2"
-          />
-          <circle
-            className="animate-pulse"
-            cx="700"
-            cy="300"
-            fill="currentColor"
-            r="2"
-            style={{ animationDelay: "1s" }}
-          />
-          <circle
-            className="animate-pulse"
-            cx="500"
-            cy="200"
-            fill="currentColor"
-            r="2"
-            style={{ animationDelay: "2s" }}
-          />
-          <circle cx="200" cy="400" fill="currentColor" r="1.5" />
-          <circle cx="800" cy="400" fill="currentColor" r="1.5" />
-        </svg>
+    <section 
+      className="relative z-10 flex flex-col items-center justify-center min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8 text-center overflow-hidden"
+    >
+      {/* Antler Mouse Effect - Canvas API (optimized, replaces SVG branching) */}
+      <AntlerMouseEffect />
+
+      {/* Animated Gradient Background - Optimized */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <motion.div 
+          className="absolute top-0 left-1/4 w-96 h-96 bg-primary/15 dark:bg-white/8 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/15 dark:bg-white/8 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.5, 0.2],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2,
+          }}
+        />
       </div>
 
-      {/* Deer Logo */}
+
+
+      {/* Animated Particles - Optimized (reduced count, removed mouse attraction for performance) */}
+      {mounted && particles.map((particle) => {
+        // Use fixed values based on particle id for consistency
+        const xOffset = (particle.id % 10) * 5 - 25;
+        
+        return (
+          <motion.div
+            key={particle.id}
+            className="absolute w-1.5 h-1.5 bg-primary/30 dark:bg-white/25 rounded-full pointer-events-none -z-10"
+            style={{
+              left: `${particle.x}%`,
+              top: `${particle.y}%`,
+            }}
+            animate={{
+              y: [0, -150, 0],
+              x: [0, xOffset, 0],
+              opacity: [0.1, 0.5, 0.1],
+              scale: [0.6, 1, 0.6],
+            }}
+            transition={{
+              duration: particle.duration,
+              repeat: Infinity,
+              delay: particle.delay,
+              ease: "easeInOut",
+            }}
+          />
+        );
+      })}
+
+
+      {/* Deer Logo with Branching Lines */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="mb-10 relative w-56 h-56 md:w-72 md:h-72 animate-draw opacity-90 hover:opacity-100 transition-opacity duration-500"
+        className="mb-10 relative w-56 h-56 md:w-72 md:h-72 lg:w-[320px] lg:h-[320px] animate-draw opacity-90 hover:opacity-100 transition-opacity duration-500 z-10"
       >
         <div className="absolute inset-0 bg-primary/5 dark:bg-white/5 blur-3xl rounded-full -z-10" />
+        
+        {/* Branching Lines SVG - More prominent */}
         <svg
-          className="w-full h-full text-primary dark:text-white stroke-current stroke-[1.5] drop-shadow-[0_0_15px_rgba(17,24,39,0.1)] dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+          className="absolute inset-0 w-full h-full text-primary/50 dark:text-white/40 pointer-events-none"
+          fill="none"
+          viewBox="0 0 200 200"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ zIndex: -1 }}
+        >
+          {/* Main branches - Animated */}
+          {branchingLines.map((line) => {
+            const path = `M ${line.startX} ${line.startY} L ${line.endX} ${line.endY}`;
+            return (
+              <motion.path
+                key={line.id}
+                d={path}
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeDasharray="4 4"
+                fill="none"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ 
+                  pathLength: [0, 1, 0.4],
+                  opacity: [0, 0.7, 0.4],
+                }}
+                transition={{
+                  pathLength: {
+                    duration: 3,
+                    delay: line.delay,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                  },
+                  opacity: {
+                    duration: 3,
+                    delay: line.delay,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                  },
+                }}
+              />
+            );
+          })}
+          {/* Secondary branching - Animated */}
+          {branchingLines.slice(0, 6).map((line) => {
+            const midX = (line.startX + line.endX) / 2;
+            const midY = (line.startY + line.endY) / 2;
+            const angle = Math.atan2(line.endY - line.startY, line.endX - line.startX);
+            const perpAngle = angle + Math.PI / 2;
+            const branchLength = 12 + (line.id % 3) * 3;
+            const branchX = midX + Math.cos(perpAngle) * branchLength;
+            const branchY = midY + Math.sin(perpAngle) * branchLength;
+            const branchPath = `M ${midX} ${midY} L ${Math.max(0, Math.min(200, branchX))} ${Math.max(0, Math.min(200, branchY))}`;
+            return (
+              <motion.path
+                key={`branch-${line.id}`}
+                d={branchPath}
+                stroke="currentColor"
+                strokeWidth="0.7"
+                strokeDasharray="2 3"
+                fill="none"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ 
+                  pathLength: [0, 1, 0.3],
+                  opacity: [0, 0.5, 0.3],
+                }}
+                transition={{
+                  pathLength: {
+                    duration: 2.5,
+                    delay: line.delay + 0.8,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                  },
+                  opacity: {
+                    duration: 2.5,
+                    delay: line.delay + 0.8,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                  },
+                }}
+              />
+            );
+          })}
+        </svg>
+
+        {/* Deer Logo SVG */}
+        <svg
+          className="w-full h-full text-primary dark:text-white stroke-current stroke-[1.5] drop-shadow-[0_0_15px_rgba(17,24,39,0.1)] dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] relative z-10"
           fill="none"
           viewBox="0 0 200 200"
           xmlns="http://www.w3.org/2000/svg"
@@ -144,17 +275,17 @@ export function HeroSection() {
       >
         <Link
           href="#work"
-          className="group relative px-10 py-4 overflow-hidden rounded-sm bg-primary text-white shadow-lg transition-all duration-300 hover:bg-opacity-90 hover:shadow-xl dark:bg-white dark:text-primary"
+          className="group relative px-10 py-4 overflow-hidden rounded-xl bg-primary text-white shadow-lg transition-all duration-300 hover:bg-opacity-90 hover:shadow-xl dark:bg-white dark:text-primary"
         >
           <span className="relative z-10 font-medium tracking-widest text-xs uppercase">
             {t.hero.viewWork}
           </span>
-          <div className="absolute inset-0 h-full w-full scale-0 rounded-sm transition-all duration-300 group-hover:scale-100 group-hover:bg-gray-200/20" />
+          <div className="absolute inset-0 h-full w-full scale-0 rounded-xl transition-all duration-300 group-hover:scale-100 group-hover:bg-gray-200/20" />
         </Link>
 
         <Link
           href="#contact"
-          className="px-10 py-4 rounded-sm border border-gray-400 dark:border-gray-600 text-gray-800 dark:text-gray-300 hover:border-primary dark:hover:border-white hover:text-primary dark:hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/10 dark:bg-black/20"
+          className="px-10 py-4 rounded-xl border border-gray-400 dark:border-gray-600 text-gray-800 dark:text-gray-300 hover:border-primary dark:hover:border-white hover:text-primary dark:hover:text-white transition-colors duration-300 backdrop-blur-sm bg-white/10 dark:bg-black/20"
         >
           <span className="font-medium tracking-widest text-xs uppercase">
             {t.hero.contactUs}
