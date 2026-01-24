@@ -4,29 +4,28 @@ import { Footer } from "@/components/layout/footer";
 import { BackgroundLayerCaseStudies } from "@/components/layout/background-layer-case-studies";
 import { ProjectDetailContent } from "@/components/case-studies/project-detail-content";
 import { notFound } from "next/navigation";
-import { translations } from "@/lib/i18n";
+import { getProjects } from "@/app/actions/projects";
 
 type Props = {
   params: { slug: string };
 };
 
 export async function generateStaticParams() {
-  const projects = [
-    translations.en.projects.flowSync.slug,
-    translations.en.projects.taskFlow.slug,
-    translations.en.projects.dataBridge.slug,
-  ];
+  const { data: projects } = await getProjects();
+  
+  if (!projects) {
+    return [];
+  }
 
-  return projects.map((slug) => ({
-    slug,
+  return projects.map((project) => ({
+    slug: project.slug,
   }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = params;
-  const project = Object.values(translations.en.projects).find(
-    (p) => p.slug === slug
-  );
+  const { data: projects } = await getProjects();
+  const project = projects?.find((p) => p.slug === slug);
 
   if (!project) {
     return {
@@ -40,11 +39,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ProjectDetailPage({ params }: Props) {
+export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = params;
-  const project = Object.values(translations.en.projects).find(
-    (p) => p.slug === slug
-  );
+  const { data: projects } = await getProjects();
+  const project = projects?.find((p) => p.slug === slug);
 
   if (!project) {
     notFound();
@@ -54,7 +52,7 @@ export default function ProjectDetailPage({ params }: Props) {
     <>
       <BackgroundLayerCaseStudies />
       <Navbar />
-      <ProjectDetailContent slug={slug} />
+      <ProjectDetailContent project={project} />
       <Footer />
     </>
   );
