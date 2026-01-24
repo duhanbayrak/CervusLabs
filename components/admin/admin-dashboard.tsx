@@ -269,10 +269,30 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
         ) : (
           <div className="glass bg-card-light dark:bg-card-dark border border-white/40 dark:border-white/5 rounded-xl p-6">
             <div className="space-y-8">
-              <PageContentEditor section="stats" sectionLabel="Stats Section" />
-              <PageContentEditor section="services" sectionLabel="Services Section" />
-              <PageContentEditor section="leadership" sectionLabel="Leadership Section" />
-              <PageContentEditor section="values" sectionLabel="Values Section" />
+              <PageContentEditor 
+                section="stats" 
+                sectionLabel="İstatistikler (Stats)" 
+                description="Ana sayfadaki istatistik bölümünü düzenleyin. Her istatistik için değer ve etiket girin."
+                previewUrl="/"
+              />
+              <PageContentEditor 
+                section="services" 
+                sectionLabel="Hizmetler (Services)" 
+                description="Ana sayfa ve Services sayfasındaki hizmetler bölümünü düzenleyin."
+                previewUrl="/services"
+              />
+              <PageContentEditor 
+                section="leadership" 
+                sectionLabel="Liderlik Ekibi (Leadership)" 
+                description="About sayfasındaki liderlik ekibi bölümünü düzenleyin. Her lider için isim ve rol girin."
+                previewUrl="/about"
+              />
+              <PageContentEditor 
+                section="values" 
+                sectionLabel="Değerler (Values)" 
+                description="About sayfasındaki değerler bölümünü düzenleyin."
+                previewUrl="/about"
+              />
             </div>
           </div>
         )}
