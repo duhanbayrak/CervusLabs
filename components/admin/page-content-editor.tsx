@@ -172,7 +172,8 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       image_url: imageUrl,
       role: role,
     });
-    setImagePreview(imageUrl);
+    // Set imagePreview to empty initially, only show if there's an actual URL
+    setImagePreview(imageUrl || '');
     setImageFile(null);
   };
 
@@ -583,7 +584,22 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                     </label>
                                     {(() => {
                                       // Determine the current logo URL to display
-                                      const currentLogoUrl = imagePreview || editValues.image_url || content.metadata?.logo_url || '';
+                                      // Priority: imagePreview (new upload) > editValues.image_url (edited) > content.metadata?.logo_url (original)
+                                      // BUT: If editValues.image_url is explicitly set to empty string, don't show logo even if content.metadata?.logo_url exists
+                                      let currentLogoUrl = '';
+                                      
+                                      if (imagePreview) {
+                                        // New image preview takes priority
+                                        currentLogoUrl = imagePreview;
+                                      } else if (editValues.image_url !== undefined) {
+                                        // If editValues.image_url is set (even if empty), use it
+                                        // This handles the case where user clicked X to remove logo
+                                        currentLogoUrl = editValues.image_url;
+                                      } else {
+                                        // Fallback to original logo from database
+                                        currentLogoUrl = content.metadata?.logo_url || '';
+                                      }
+                                      
                                       const shouldShowLogo = currentLogoUrl && currentLogoUrl.trim() !== '';
                                       
                                       return shouldShowLogo ? (
