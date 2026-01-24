@@ -31,16 +31,17 @@ export function HeroSection() {
   const branchingLines = [
     // Left antler branches - Key points only
     { id: 1, startX: 40, startY: 50, endX: 20, endY: 30, delay: 0 },
-    { id: 2, startX: 40, startY: 50, endX: 10, endY: 60, delay: 0.3 },
-    { id: 3, startX: 60, startY: 40, endX: 30, endY: 20, delay: 0.2 },
-    { id: 4, startX: 60, startY: 40, endX: 80, endY: 15, delay: 0.4 },
-    { id: 5, startX: 80, startY: 30, endX: 70, endY: 10, delay: 0.5 },
+    { id: 2, startX: 60, startY: 40, endX: 30, endY: 20, delay: 0.2 },
+    { id: 3, startX: 80, startY: 30, endX: 70, endY: 10, delay: 0.4 },
     // Right antler branches - Key points only
-    { id: 6, startX: 140, startY: 40, endX: 170, endY: 20, delay: 0.2 },
-    { id: 7, startX: 140, startY: 40, endX: 120, endY: 15, delay: 0.4 },
-    { id: 8, startX: 160, startY: 50, endX: 190, endY: 60, delay: 0.3 },
-    { id: 9, startX: 160, startY: 50, endX: 180, endY: 30, delay: 0.5 },
-    { id: 10, startX: 120, startY: 30, endX: 130, endY: 10, delay: 0.6 },
+    { id: 4, startX: 140, startY: 40, endX: 170, endY: 20, delay: 0.2 },
+    { id: 5, startX: 160, startY: 50, endX: 190, endY: 60, delay: 0.3 },
+    { id: 6, startX: 120, startY: 30, endX: 130, endY: 10, delay: 0.5 },
+    // Side branches from lower points
+    { id: 7, startX: 25, startY: 85, endX: 10, endY: 100, delay: 0.6 },
+    { id: 8, startX: 25, startY: 85, endX: 15, endY: 70, delay: 0.7 },
+    { id: 9, startX: 175, startY: 85, endX: 190, endY: 100, delay: 0.6 },
+    { id: 10, startX: 175, startY: 85, endX: 185, endY: 70, delay: 0.7 },
   ];
 
   return (
@@ -122,7 +123,7 @@ export function HeroSection() {
         
         {/* Branching Lines SVG - More prominent */}
         <svg
-          className="absolute inset-0 w-full h-full text-primary/50 dark:text-white/40 pointer-events-none"
+          className="absolute inset-0 w-full h-full text-primary/60 dark:text-white/40 pointer-events-none"
           fill="none"
           viewBox="0 0 200 200"
           xmlns="http://www.w3.org/2000/svg"
@@ -141,23 +142,24 @@ export function HeroSection() {
                 fill="none"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ 
-                  pathLength: [0, 1, 0.4],
-                  opacity: [0, 0.7, 0.4],
+                  pathLength: [0, 1, 0.6],
+                  opacity: [0, 0.8, 0.6, 0.4, 0.2],
                 }}
                 transition={{
                   pathLength: {
-                    duration: 3,
+                    duration: 4,
                     delay: line.delay,
                     repeat: Infinity,
                     repeatType: "loop",
                     ease: "easeInOut",
                   },
                   opacity: {
-                    duration: 3,
+                    duration: 5,
                     delay: line.delay,
                     repeat: Infinity,
                     repeatType: "loop",
-                    ease: "easeInOut",
+                    ease: [0.4, 0, 0.2, 1],
+                    times: [0, 0.2, 0.4, 0.7, 1],
                   },
                 }}
               />
@@ -183,23 +185,24 @@ export function HeroSection() {
                 fill="none"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ 
-                  pathLength: [0, 1, 0.3],
-                  opacity: [0, 0.5, 0.3],
+                  pathLength: [0, 1, 0.5],
+                  opacity: [0, 0.6, 0.5, 0.3, 0.15],
                 }}
                 transition={{
                   pathLength: {
-                    duration: 2.5,
+                    duration: 3.5,
                     delay: line.delay + 0.8,
                     repeat: Infinity,
                     repeatType: "loop",
                     ease: "easeInOut",
                   },
                   opacity: {
-                    duration: 2.5,
+                    duration: 4.5,
                     delay: line.delay + 0.8,
                     repeat: Infinity,
                     repeatType: "loop",
-                    ease: "easeInOut",
+                    ease: [0.4, 0, 0.2, 1],
+                    times: [0, 0.2, 0.4, 0.7, 1],
                   },
                 }}
               />

@@ -51,6 +51,16 @@ export function AntlerMouseEffect() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Helper function to check if dark mode is active
+    const isDarkMode = () => {
+      if (resolvedTheme === "dark") return true;
+      if (resolvedTheme === "light") return false;
+      if (typeof window !== "undefined") {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+      }
+      return false;
+    };
+
     // Set canvas size
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -176,8 +186,7 @@ export function AntlerMouseEffect() {
           // Draw the branch
           ctx.save();
           // Use white for dark mode, dark gray for light mode
-          const isDark = resolvedTheme === "dark" || 
-            (resolvedTheme === undefined && theme === "system" && typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          const isDark = isDarkMode();
           const strokeColor = isDark 
             ? `rgba(255, 255, 255, ${branch.opacity * 0.6})` // White with opacity for dark mode
             : `rgba(17, 24, 39, ${branch.opacity})`; // Dark gray with opacity for light mode
@@ -210,7 +219,7 @@ export function AntlerMouseEffect() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [mounted]);
+  }, [mounted, theme, resolvedTheme]);
 
   if (!mounted) return null;
 
