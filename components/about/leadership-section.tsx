@@ -1,30 +1,49 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { User } from "lucide-react";
 import { SectionTransition } from "@/components/transitions/section-transition";
 import { useLanguage } from "@/contexts/language-context";
+import { getPageContent } from "@/app/actions/page-content";
 
-const leaders = [
-  {
-    name: "Dr. Elena Vos",
-    role: "Chief Executive Officer",
-  },
-  {
-    name: "Marcus Chen",
-    role: "CTO & Lead Architect",
-  },
-  {
-    name: "Sarah O'Neil",
-    role: "Head of Product Design",
-  },
-  {
-    name: "James Thorne",
-    role: "VP of Engineering",
-  },
-];
+interface Leader {
+  name: string;
+  role: string;
+}
 
 export function LeadershipSection() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const [leaders, setLeaders] = useState<Leader[]>([
+    { name: "Dr. Elena Vos", role: "Chief Executive Officer" },
+    { name: "Marcus Chen", role: "CTO & Lead Architect" },
+    { name: "Sarah O'Neil", role: "Head of Product Design" },
+    { name: "James Thorne", role: "VP of Engineering" },
+  ]);
+
+  useEffect(() => {
+    const loadLeaders = async () => {
+      const { data } = await getPageContent('leadership');
+      if (data) {
+        const leadersData: Leader[] = [];
+        for (let i = 0; i < 4; i++) {
+          const nameKey = `leader${i + 1}_name`;
+          const nameContent = data.find(c => c.content_key === nameKey);
+          
+          if (nameContent) {
+            const name = locale === 'tr' ? (nameContent.value_tr || nameContent.value_en || '') : (nameContent.value_en || '');
+            const role = nameContent.metadata?.role || '';
+            if (name) {
+              leadersData.push({ name, role });
+            }
+          }
+        }
+        if (leadersData.length > 0) {
+          setLeaders(leadersData);
+        }
+      }
+    };
+    loadLeaders();
+  }, [locale]);
   return (
     <SectionTransition>
       <section className="relative z-10 py-24 bg-white dark:bg-background-dark border-t border-gray-200 dark:border-gray-800">

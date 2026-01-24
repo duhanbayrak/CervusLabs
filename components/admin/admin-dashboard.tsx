@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, LogOut, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, Loader2, FileText, Folder } from 'lucide-react';
 import { Project } from '@/lib/supabase/types';
 import { getProjects, deleteProject } from '@/app/actions/projects';
 import { signOut } from '@/app/actions/auth';
 import { ProjectForm } from './project-form';
+import { PageContentEditor } from './page-content-editor';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/language-context';
 import { LanguageSwitcher } from '@/components/layout/language-switcher';
@@ -15,8 +16,11 @@ interface AdminDashboardProps {
   error: string | null;
 }
 
+type TabType = 'projects' | 'content';
+
 export function AdminDashboard({ initialProjects, error: initialError }: AdminDashboardProps) {
   const { t } = useLanguage();
+  const [activeTab, setActiveTab] = useState<TabType>('projects');
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError);
@@ -91,17 +95,47 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
               <LogOut className="w-4 h-4" />
               {t.admin.dashboard.signOut}
             </button>
-            <button
-              onClick={() => {
-                setEditingProject(null);
-                setShowForm(true);
-              }}
-              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 text-sm font-medium"
-            >
-              <Plus className="w-4 h-4" />
-              {t.admin.dashboard.addProject}
-            </button>
+            {activeTab === 'projects' && (
+              <button
+                onClick={() => {
+                  setEditingProject(null);
+                  setShowForm(true);
+                }}
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 text-sm font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                {t.admin.dashboard.addProject}
+              </button>
+            )}
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="mb-6 border-b border-gray-200 dark:border-gray-800">
+          <nav className="flex gap-4">
+            <button
+              onClick={() => setActiveTab('projects')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                activeTab === 'projects'
+                  ? 'border-primary text-primary dark:text-white'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white'
+              }`}
+            >
+              <Folder className="w-4 h-4" />
+              Projects
+            </button>
+            <button
+              onClick={() => setActiveTab('content')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                activeTab === 'content'
+                  ? 'border-primary text-primary dark:text-white'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              Page Content
+            </button>
+          </nav>
         </div>
 
         {/* Error Message */}
@@ -111,8 +145,9 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
           </div>
         )}
 
-        {/* Projects Table */}
-        <div className="glass bg-card-light dark:bg-card-dark border border-white/40 dark:border-white/5 rounded-xl overflow-hidden">
+        {/* Content based on active tab */}
+        {activeTab === 'projects' ? (
+          <div className="glass bg-card-light dark:bg-card-dark border border-white/40 dark:border-white/5 rounded-xl overflow-hidden">
           {loading ? (
             <div className="p-12 text-center">
               <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary mb-4" />
@@ -220,6 +255,16 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
             </div>
           )}
         </div>
+        ) : (
+          <div className="glass bg-card-light dark:bg-card-dark border border-white/40 dark:border-white/5 rounded-xl p-6">
+            <div className="space-y-8">
+              <PageContentEditor section="stats" sectionLabel="Stats Section" />
+              <PageContentEditor section="services" sectionLabel="Services Section" />
+              <PageContentEditor section="leadership" sectionLabel="Leadership Section" />
+              <PageContentEditor section="values" sectionLabel="Values Section" />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Project Form Modal */}

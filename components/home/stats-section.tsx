@@ -1,17 +1,45 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { SectionTransition } from "@/components/transitions/section-transition";
 import { useLanguage } from "@/contexts/language-context";
+import { getPageContent } from "@/app/actions/page-content";
+import { PageContent } from "@/app/actions/page-content";
 
 export function StatsSection() {
-  const { t } = useLanguage();
-
-  const stats = [
+  const { t, locale } = useLanguage();
+  const [stats, setStats] = useState([
     { value: "45+", label: t.stats.enterpriseClients },
     { value: "$20M", label: t.stats.revenueGenerated },
     { value: "99.9%", label: t.stats.uptimeDelivered },
     { value: "12", label: t.stats.globalAwards },
-  ];
+  ]);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const { data } = await getPageContent('stats');
+      if (data) {
+        const statsData: { value: string; label: string }[] = [];
+        for (let i = 0; i < 4; i++) {
+          const valueKey = `stat${i + 1}_value`;
+          const labelKey = `stat${i + 1}_label`;
+          const valueContent = data.find(c => c.content_key === valueKey);
+          const labelContent = data.find(c => c.content_key === labelKey);
+          
+          if (valueContent && labelContent) {
+            statsData.push({
+              value: locale === 'tr' ? (valueContent.value_tr || valueContent.value_en || '') : (valueContent.value_en || ''),
+              label: locale === 'tr' ? (labelContent.value_tr || labelContent.value_en || '') : (labelContent.value_en || ''),
+            });
+          }
+        }
+        if (statsData.length > 0) {
+          setStats(statsData);
+        }
+      }
+    };
+    loadStats();
+  }, [locale, t.stats.enterpriseClients, t.stats.revenueGenerated, t.stats.uptimeDelivered, t.stats.globalAwards]);
 
   return (
     <SectionTransition>
