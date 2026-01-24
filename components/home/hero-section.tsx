@@ -10,7 +10,7 @@ import { AntlerMouseEffect } from "@/components/ui/AntlerMouseEffect";
 export function HeroSection() {
   const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
-  const [animationKey, setAnimationKey] = useState(0);
+  const [animationStarted, setAnimationStarted] = useState(false);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number; duration: number }>>([]);
   const mousePositionRef = useRef({ x: 0, y: 0 });
 
@@ -28,15 +28,19 @@ export function HeroSection() {
     }));
     setParticles(particleData);
     
-    // Force animation restart using requestAnimationFrame to ensure DOM is ready
-    const rafId = requestAnimationFrame(() => {
-      // Use double RAF to ensure animations start after render
-      requestAnimationFrame(() => {
-        setAnimationKey(prev => prev + 1);
+    // Start animations immediately after mount
+    // Use multiple RAFs to ensure DOM is fully ready
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(() => {
+        const raf3 = requestAnimationFrame(() => {
+          setAnimationStarted(true);
+        });
+        return () => cancelAnimationFrame(raf3);
       });
+      return () => cancelAnimationFrame(raf2);
     });
     
-    return () => cancelAnimationFrame(rafId);
+    return () => cancelAnimationFrame(raf1);
   }, []);
 
   // Branching lines from antlers - Minimalist optimized version
@@ -136,44 +140,40 @@ export function HeroSection() {
         
         {/* Branching Lines SVG - More prominent */}
         {mounted && (
-          <motion.svg
+          <svg
             className="absolute inset-0 w-full h-full text-primary/60 dark:text-white/40 pointer-events-none"
             fill="none"
             viewBox="0 0 200 200"
             xmlns="http://www.w3.org/2000/svg"
             style={{ zIndex: -1 }}
-            key={`branching-svg-${animationKey}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
           >
             {/* Main branches - Animated */}
             {branchingLines.map((line) => {
               const path = `M ${line.startX} ${line.startY} L ${line.endX} ${line.endY}`;
               return (
                 <motion.path
-                  key={`${line.id}-${animationKey}`}
+                  key={`${line.id}`}
                   d={path}
                   stroke="currentColor"
                   strokeWidth="1.2"
                   strokeDasharray="4 4"
                   fill="none"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ 
+                  initial={false}
+                  animate={animationStarted ? { 
                     pathLength: [0, 1, 0.6],
                     opacity: [0, 0.8, 0.6, 0.4, 0.2],
-                  }}
+                  } : { pathLength: 0, opacity: 0 }}
                   transition={{
                     pathLength: {
                       duration: 4,
-                      delay: line.delay + 0.1,
+                      delay: line.delay,
                       repeat: Infinity,
                       repeatType: "loop",
                       ease: "easeInOut",
                     },
                     opacity: {
                       duration: 5,
-                      delay: line.delay + 0.1,
+                      delay: line.delay,
                       repeat: Infinity,
                       repeatType: "loop",
                       ease: [0.4, 0, 0.2, 1],
@@ -195,28 +195,28 @@ export function HeroSection() {
               const branchPath = `M ${midX} ${midY} L ${Math.max(0, Math.min(200, branchX))} ${Math.max(0, Math.min(200, branchY))}`;
               return (
                 <motion.path
-                  key={`branch-${line.id}-${animationKey}`}
+                  key={`branch-${line.id}`}
                   d={branchPath}
                   stroke="currentColor"
                   strokeWidth="0.7"
                   strokeDasharray="2 3"
                   fill="none"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ 
+                  initial={false}
+                  animate={animationStarted ? { 
                     pathLength: [0, 1, 0.5],
                     opacity: [0, 0.6, 0.5, 0.3, 0.15],
-                  }}
+                  } : { pathLength: 0, opacity: 0 }}
                   transition={{
                     pathLength: {
                       duration: 3.5,
-                      delay: line.delay + 0.9,
+                      delay: line.delay + 0.8,
                       repeat: Infinity,
                       repeatType: "loop",
                       ease: "easeInOut",
                     },
                     opacity: {
                       duration: 4.5,
-                      delay: line.delay + 0.9,
+                      delay: line.delay + 0.8,
                       repeat: Infinity,
                       repeatType: "loop",
                       ease: [0.4, 0, 0.2, 1],
@@ -226,7 +226,7 @@ export function HeroSection() {
                 />
               );
             })}
-          </motion.svg>
+          </svg>
         )}
 
         {/* Deer Logo SVG */}
