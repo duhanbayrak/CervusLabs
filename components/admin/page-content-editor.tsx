@@ -225,6 +225,8 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
   const handleRemoveImage = () => {
     setImageFile(null);
     setImagePreview('');
+    // Clear image_url for both leadership and trusted-by sections
+    // For trusted-by, we use image_url in editValues but it represents logo_url
     setEditValues(prev => ({ ...prev, image_url: '' }));
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -252,7 +254,9 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
     }
 
     // Merge metadata: preserve existing metadata and update image_url/logo_url and role
-    const metadata: Record<string, any> = { ...existingMetadata };
+    // Start with a clean copy of existing metadata
+    const metadata: Record<string, any> = existingMetadata ? { ...existingMetadata } : {};
+    
     if (section === 'leadership') {
       // Always update image_url based on finalImageUrl
       // If finalImageUrl is empty string or null/undefined, remove it from metadata
@@ -260,14 +264,13 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
         metadata.image_url = finalImageUrl.trim();
       } else {
         // Explicitly remove image_url from metadata if it's empty
-        // Use undefined to signal deletion in merge
         if ('image_url' in metadata) {
           delete metadata.image_url;
         }
       }
       // Update role if provided
       if (editValues.role !== undefined) {
-        if (editValues.role.trim()) {
+        if (editValues.role && editValues.role.trim()) {
           metadata.role = editValues.role.trim();
         } else {
           if ('role' in metadata) {
@@ -277,6 +280,7 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       }
     } else if (section === 'trusted-by') {
       // For trusted-by section, use logo_url instead of image_url
+      // Check if image_url is empty (which means user wants to remove the logo)
       if (finalImageUrl && finalImageUrl.trim() && finalImageUrl !== '') {
         metadata.logo_url = finalImageUrl.trim();
       } else {
@@ -287,11 +291,13 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       }
     }
 
-    // Send metadata (empty object if all keys were deleted)
+    // Prepare metadata for sending - use null if empty, otherwise send the cleaned object
+    const metadataToSend = Object.keys(metadata).length > 0 ? metadata : null;
+
     const { data, error: saveError } = await updatePageContent(id, {
       value_en: editValues.value_en || null,
       value_tr: editValues.value_tr || null,
-      metadata: Object.keys(metadata).length > 0 ? metadata : null,
+      metadata: metadataToSend,
     });
 
     if (saveError) {
@@ -576,12 +582,14 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                       Şirket Logosu
                                     </label>
                                     {(() => {
-                                      // Show logo if there's a preview or if editValues.image_url is set (not empty)
-                                      const shouldShowLogo = imagePreview || (editValues.image_url && editValues.image_url.trim() !== '') || (content.metadata?.logo_url && content.metadata.logo_url.trim() !== '');
+                                      // Determine the current logo URL to display
+                                      const currentLogoUrl = imagePreview || editValues.image_url || content.metadata?.logo_url || '';
+                                      const shouldShowLogo = currentLogoUrl && currentLogoUrl.trim() !== '';
+                                      
                                       return shouldShowLogo ? (
                                         <div className="relative inline-block">
                                           <img
-                                            src={imagePreview || editValues.image_url || content.metadata?.logo_url}
+                                            src={currentLogoUrl}
                                             alt="Preview"
                                             className="h-16 max-w-[200px] object-contain rounded-lg border border-gray-300 dark:border-gray-700 bg-white p-2"
                                           />

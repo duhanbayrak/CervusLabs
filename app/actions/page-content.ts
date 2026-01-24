@@ -66,37 +66,70 @@ export async function updatePageContent(
   try {
     const supabase = await createClient();
     
-    // If metadata is being updated, use it directly (already merged on client side)
-    // The client sends the final metadata state, so we can use it as-is
+    // Prepare update object, ensuring metadata is properly formatted
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+    };
+    
+    if (updates.value_en !== undefined) {
+      updateData.value_en = updates.value_en;
+    }
+    if (updates.value_tr !== undefined) {
+      updateData.value_tr = updates.value_tr;
+    }
+    
+    // Handle metadata update carefully
     if (updates.metadata !== undefined) {
       // If metadata is null or empty object, set it to null in database
       if (updates.metadata === null) {
-        updates.metadata = null;
+        updateData.metadata = null;
       } else if (typeof updates.metadata === 'object' && Object.keys(updates.metadata).length === 0) {
-        updates.metadata = null;
-      } else {
+        updateData.metadata = null;
+      } else if (typeof updates.metadata === 'object') {
         // Remove any null or undefined values from metadata
         const cleanedMetadata: Record<string, any> = {};
         Object.keys(updates.metadata).forEach(key => {
-          if (updates.metadata![key] !== null && updates.metadata![key] !== undefined) {
-            cleanedMetadata[key] = updates.metadata![key];
+          const value = updates.metadata![key];
+          if (value !== null && value !== undefined) {
+            cleanedMetadata[key] = value;
           }
         });
-        updates.metadata = Object.keys(cleanedMetadata).length > 0 ? cleanedMetadata : null;
+        // Only set metadata if there are valid keys, otherwise set to null
+        updateData.metadata = Object.keys(cleanedMetadata).length > 0 ? cleanedMetadata : null;
+      } else {
+        // If it's not an object, set to null
+        updateData.metadata = null;
       }
     }
     
+    // First, verify that only one row will be updated
+    const { count, error: countError } = await supabase
+      .from('page_content')
+      .select('*', { count: 'exact', head: true })
+      .eq('id', id);
+    
+    if (countError) {
+      console.error('updatePageContent count error:', countError);
+      throw countError;
+    }
+    
+    if (count !== 1) {
+      throw new Error(`Expected exactly 1 row to update, found ${count}`);
+    }
+    
+    // Perform the update
     const { data, error } = await supabase
       .from('page_content')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
     
-    if (error) throw error;
+    if (error) {
+      console.error('updatePageContent error:', error);
+      console.error('updateData:', JSON.stringify(updateData, null, 2));
+      throw error;
+    }
     
     revalidatePath('/');
     revalidatePath('/about');
@@ -104,7 +137,8 @@ export async function updatePageContent(
     
     return { data, error: null };
   } catch (error: any) {
-    return { data: null, error: error.message };
+    console.error('updatePageContent exception:', error);
+    return { data: null, error: error.message || 'Unknown error' };
   }
 }
 
