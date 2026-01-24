@@ -110,30 +110,32 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="mb-8 bg-white dark:bg-gray-900/50 rounded-lg p-2 border border-gray-200 dark:border-gray-800">
-          <nav className="flex gap-2">
+        {/* Tabs - More visible */}
+        <div className="mb-8 glass bg-card-light dark:bg-card-dark border border-white/40 dark:border-white/5 rounded-xl p-1 shadow-lg">
+          <nav className="flex gap-1">
             <button
               onClick={() => setActiveTab('projects')}
-              className={`flex-1 px-6 py-3 text-base font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
+              type="button"
+              className={`flex-1 px-6 py-4 text-base font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
                 activeTab === 'projects'
-                  ? 'bg-primary text-white shadow-md'
-                  : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white'
+                  ? 'bg-primary text-white shadow-lg'
+                  : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
               <Folder className="w-5 h-5" />
-              Projects
+              <span>Projects</span>
             </button>
             <button
               onClick={() => setActiveTab('content')}
-              className={`flex-1 px-6 py-3 text-base font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
+              type="button"
+              className={`flex-1 px-6 py-4 text-base font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
                 activeTab === 'content'
-                  ? 'bg-primary text-white shadow-md'
-                  : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white'
+                  ? 'bg-primary text-white shadow-lg'
+                  : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
               <FileText className="w-5 h-5" />
-              Page Content
+              <span>Page Content</span>
             </button>
           </nav>
         </div>
