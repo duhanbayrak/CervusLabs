@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Save, Loader2, Edit2, Eye, ExternalLink, ChevronDown, ChevronRight, Upload, Image as ImageIcon, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { PageContent } from '@/app/actions/page-content';
 import { getPageContent, updatePageContent } from '@/app/actions/page-content';
 import { refreshAuthToken } from '@/app/actions/auth-refresh';
@@ -77,6 +78,7 @@ const getContentLabel = (contentKey: string): string => {
 
 export function PageContentEditor({ section, sectionLabel, description, previewUrl }: PageContentEditorProps) {
   const { t, locale } = useLanguage();
+  const router = useRouter();
   const [contents, setContents] = useState<PageContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -175,8 +177,8 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
     }
   };
 
-  const handleImageUpload = async (contentId: string) => {
-    if (!imageFile) return;
+  const handleImageUpload = async (contentId: string): Promise<string | null> => {
+    if (!imageFile) return null;
 
     setUploadingImage(contentId);
     setError('');
@@ -190,12 +192,13 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
 
     if (uploadError || !url) {
       setError(uploadError || 'Görsel yüklenemedi');
-      return;
+      return null;
     }
 
     setEditValues({ ...editValues, image_url: url });
     setImagePreview(url);
     setImageFile(null);
+    return url;
   };
 
   const handleRemoveImage = () => {
@@ -211,20 +214,37 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
     setSaving(id);
     setError(null);
     
+    // Find the current content to preserve existing metadata
+    const currentContent = contents.find(c => c.id === id);
+    const existingMetadata = currentContent?.metadata || {};
+    
     // If there's a new image file, upload it first
+    let finalImageUrl = editValues.image_url;
     if (imageFile) {
-      await handleImageUpload(id);
+      const uploadResult = await handleImageUpload(id);
+      if (uploadResult) {
+        finalImageUrl = uploadResult;
+      } else {
+        setSaving(null);
+        return; // Don't save if image upload failed
+      }
     }
 
-    const metadata: Record<string, any> = {};
-    if (section === 'leadership' && editValues.image_url) {
-      metadata.image_url = editValues.image_url;
+    // Merge metadata: preserve existing metadata and update image_url
+    const metadata: Record<string, any> = { ...existingMetadata };
+    if (section === 'leadership') {
+      if (finalImageUrl) {
+        metadata.image_url = finalImageUrl;
+      } else {
+        // If image_url is empty, remove it from metadata
+        delete metadata.image_url;
+      }
     }
 
     const { data, error: saveError } = await updatePageContent(id, {
       value_en: editValues.value_en || null,
       value_tr: editValues.value_tr || null,
-      metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
+      metadata: Object.keys(metadata).length > 0 ? metadata : null,
     });
 
     if (saveError) {
@@ -235,6 +255,8 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       setImageFile(null);
       setImagePreview('');
       await loadContents();
+      // Refresh the router to update the page
+      router.refresh();
       setSaving(null);
     }
   };

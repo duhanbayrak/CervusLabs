@@ -67,9 +67,28 @@ export async function updatePageContent(
   try {
     const supabase = await createClient();
     
+    // If metadata is being updated, merge with existing metadata
+    if (updates.metadata !== undefined) {
+      // Get current content first
+      const { data: currentData } = await supabase
+        .from('page_content')
+        .select('metadata')
+        .eq('id', id)
+        .single();
+      
+      if (currentData) {
+        const existingMetadata = currentData.metadata || {};
+        // Merge existing metadata with new metadata
+        updates.metadata = { ...existingMetadata, ...updates.metadata };
+      }
+    }
+    
     const { data, error } = await supabase
       .from('page_content')
-      .update(updates)
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', id)
       .select()
       .single();
