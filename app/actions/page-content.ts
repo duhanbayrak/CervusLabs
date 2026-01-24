@@ -67,33 +67,12 @@ export async function updatePageContent(
   try {
     const supabase = await createClient();
     
-    // If metadata is being updated, merge with existing metadata
+    // If metadata is being updated, use it directly (already merged on client side)
+    // The client sends the final metadata state, so we can use it as-is
     if (updates.metadata !== undefined) {
-      // Get current content first
-      const { data: currentData } = await supabase
-        .from('page_content')
-        .select('metadata')
-        .eq('id', id)
-        .single();
-      
-      if (currentData) {
-        const existingMetadata = currentData.metadata || {};
-        // If updates.metadata is null, it means we want to clear metadata
-        if (updates.metadata === null) {
-          updates.metadata = null;
-        } else {
-          // Merge existing metadata with new metadata
-          // If a key is explicitly deleted (undefined), remove it
-          const mergedMetadata = { ...existingMetadata };
-          Object.keys(updates.metadata).forEach(key => {
-            if (updates.metadata![key] === undefined) {
-              delete mergedMetadata[key];
-            } else {
-              mergedMetadata[key] = updates.metadata![key];
-            }
-          });
-          updates.metadata = mergedMetadata;
-        }
+      // If metadata is an empty object or null, set it to null in database
+      if (updates.metadata === null || (typeof updates.metadata === 'object' && Object.keys(updates.metadata).length === 0)) {
+        updates.metadata = null;
       }
     }
     

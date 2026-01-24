@@ -242,24 +242,31 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
         metadata.image_url = finalImageUrl.trim();
       } else {
         // Explicitly remove image_url from metadata if it's empty
-        if ('image_url' in metadata) {
-          delete metadata.image_url;
-        }
+        // Use undefined to signal deletion in merge
+        metadata.image_url = undefined;
       }
       // Update role if provided
       if (editValues.role !== undefined) {
         if (editValues.role.trim()) {
           metadata.role = editValues.role.trim();
         } else {
-          delete metadata.role;
+          metadata.role = undefined;
         }
       }
     }
 
+    // Remove undefined values before sending
+    const cleanedMetadata: Record<string, any> = {};
+    Object.keys(metadata).forEach(key => {
+      if (metadata[key] !== undefined) {
+        cleanedMetadata[key] = metadata[key];
+      }
+    });
+
     const { data, error: saveError } = await updatePageContent(id, {
       value_en: editValues.value_en || null,
       value_tr: editValues.value_tr || null,
-      metadata: Object.keys(metadata).length > 0 ? metadata : null,
+      metadata: Object.keys(cleanedMetadata).length > 0 ? cleanedMetadata : null,
     });
 
     if (saveError) {
