@@ -13,9 +13,24 @@ export async function createClient() {
 
   const cookieStore = await cookies();
   
-  // Get auth tokens from cookies
+  // Get auth tokens from cookies - check multiple cookie names
+  const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'lieailmnmczmxiqwdaai';
+  const supabaseCookie = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
   const accessToken = cookieStore.get('sb-access-token')?.value;
   const refreshToken = cookieStore.get('sb-refresh-token')?.value;
+
+  // Try to parse Supabase cookie if it exists
+  let parsedSession = null;
+  if (supabaseCookie) {
+    try {
+      parsedSession = JSON.parse(decodeURIComponent(supabaseCookie));
+    } catch {
+      // Cookie is not JSON, ignore
+    }
+  }
+
+  const finalAccessToken = parsedSession?.access_token || accessToken;
+  const finalRefreshToken = parsedSession?.refresh_token || refreshToken;
 
   const supabase = createSupabaseClient(
     supabaseUrl,
@@ -27,18 +42,18 @@ export async function createClient() {
         detectSessionInUrl: false,
       },
       global: {
-        headers: accessToken ? {
-          Authorization: `Bearer ${accessToken}`,
+        headers: finalAccessToken ? {
+          Authorization: `Bearer ${finalAccessToken}`,
         } : {},
       },
     }
   );
 
   // Set session if tokens exist
-  if (accessToken && refreshToken) {
+  if (finalAccessToken && finalRefreshToken) {
     await supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
+      access_token: finalAccessToken,
+      refresh_token: finalRefreshToken,
     });
   }
 

@@ -41,12 +41,28 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
-        // Store session tokens in cookies
+        // Supabase automatically handles cookies with persistSession: true
+        // Also manually set cookies as fallback for server-side access
+        const projectRef = process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0] || 'lieailmnmczmxiqwdaai';
+        const cookieValue = JSON.stringify({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+          expires_at: data.session.expires_at,
+          expires_in: data.session.expires_in,
+          token_type: data.session.token_type,
+          user: data.session.user,
+        });
+        
+        // Set Supabase's own cookie format
+        document.cookie = `sb-${projectRef}-auth-token=${encodeURIComponent(cookieValue)}; path=/; max-age=604800; SameSite=Lax`;
+        
+        // Also set our custom cookies for middleware
         document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=3600; SameSite=Lax`;
         document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=604800; SameSite=Lax`;
         
-        router.push('/admin');
-        router.refresh();
+        // Wait a bit for cookies to be set, then redirect
+        await new Promise(resolve => setTimeout(resolve, 200));
+        window.location.href = '/admin';
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred');

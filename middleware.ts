@@ -1,14 +1,31 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  // Basic protection - actual auth check will be done in server components
-  // This just redirects if no auth cookies are present
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const projectRef = supabaseUrl?.split('//')[1]?.split('.')[0] || 'lieailmnmczmxiqwdaai';
+  
+  // Protect /admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    const hasAuthCookie = request.cookies.has('sb-access-token') || 
-                           request.cookies.has('supabase.auth.token');
+    // Check for Supabase auth cookies
+    const hasAuthCookie = 
+      request.cookies.has('sb-access-token') || 
+      request.cookies.has('supabase.auth.token') ||
+      request.cookies.has(`sb-${projectRef}-auth-token`);
     
     if (!hasAuthCookie) {
       return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
+  // Redirect authenticated users away from /login
+  if (request.nextUrl.pathname === '/login') {
+    const hasAuthCookie = 
+      request.cookies.has('sb-access-token') || 
+      request.cookies.has('supabase.auth.token') ||
+      request.cookies.has(`sb-${projectRef}-auth-token`);
+    
+    if (hasAuthCookie) {
+      return NextResponse.redirect(new URL('/admin', request.url));
     }
   }
 
