@@ -71,9 +71,20 @@ export async function updatePageContent(
     // If metadata is being updated, use it directly (already merged on client side)
     // The client sends the final metadata state, so we can use it as-is
     if (updates.metadata !== undefined) {
-      // If metadata is an empty object or null, set it to null in database
-      if (updates.metadata === null || (typeof updates.metadata === 'object' && Object.keys(updates.metadata).length === 0)) {
+      // If metadata is null or empty object, set it to null in database
+      if (updates.metadata === null) {
         updates.metadata = null;
+      } else if (typeof updates.metadata === 'object' && Object.keys(updates.metadata).length === 0) {
+        updates.metadata = null;
+      } else {
+        // Remove any null or undefined values from metadata
+        const cleanedMetadata: Record<string, any> = {};
+        Object.keys(updates.metadata).forEach(key => {
+          if (updates.metadata![key] !== null && updates.metadata![key] !== undefined) {
+            cleanedMetadata[key] = updates.metadata![key];
+          }
+        });
+        updates.metadata = Object.keys(cleanedMetadata).length > 0 ? cleanedMetadata : null;
       }
     }
     

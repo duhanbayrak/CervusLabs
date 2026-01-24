@@ -161,7 +161,10 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
 
   const handleEdit = (content: PageContent) => {
     setEditingId(content.id);
-    const imageUrl = content.metadata?.image_url || content.metadata?.logo_url || '';
+    // Get image_url for leadership, logo_url for trusted-by
+    const imageUrl = section === 'trusted-by' 
+      ? (content.metadata?.logo_url || '')
+      : (content.metadata?.image_url || '');
     const role = content.metadata?.role || '';
     setEditValues({
       value_en: content.value_en || '',
@@ -258,14 +261,18 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       } else {
         // Explicitly remove image_url from metadata if it's empty
         // Use undefined to signal deletion in merge
-        metadata.image_url = undefined;
+        if ('image_url' in metadata) {
+          delete metadata.image_url;
+        }
       }
       // Update role if provided
       if (editValues.role !== undefined) {
         if (editValues.role.trim()) {
           metadata.role = editValues.role.trim();
         } else {
-          metadata.role = undefined;
+          if ('role' in metadata) {
+            delete metadata.role;
+          }
         }
       }
     } else if (section === 'trusted-by') {
@@ -273,22 +280,18 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       if (finalImageUrl && finalImageUrl.trim() && finalImageUrl !== '') {
         metadata.logo_url = finalImageUrl.trim();
       } else {
-        metadata.logo_url = undefined;
+        // Explicitly remove logo_url from metadata if it's empty
+        if ('logo_url' in metadata) {
+          delete metadata.logo_url;
+        }
       }
     }
 
-    // Remove undefined values before sending
-    const cleanedMetadata: Record<string, any> = {};
-    Object.keys(metadata).forEach(key => {
-      if (metadata[key] !== undefined) {
-        cleanedMetadata[key] = metadata[key];
-      }
-    });
-
+    // Send metadata (empty object if all keys were deleted)
     const { data, error: saveError } = await updatePageContent(id, {
       value_en: editValues.value_en || null,
       value_tr: editValues.value_tr || null,
-      metadata: Object.keys(cleanedMetadata).length > 0 ? cleanedMetadata : null,
+      metadata: Object.keys(metadata).length > 0 ? metadata : null,
     });
 
     if (saveError) {
@@ -572,23 +575,28 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                                       Şirket Logosu
                                     </label>
-                                    {(imagePreview || content.metadata?.logo_url) ? (
-                                      <div className="relative inline-block">
-                                        <img
-                                          src={imagePreview || content.metadata?.logo_url}
-                                          alt="Preview"
-                                          className="h-16 max-w-[200px] object-contain rounded-lg border border-gray-300 dark:border-gray-700 bg-white p-2"
-                                        />
-                                        <button
-                                          type="button"
-                                          onClick={handleRemoveImage}
-                                          className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
-                                          title="Logoyu Sil"
-                                        >
-                                          <X className="w-3 h-3" />
-                                        </button>
-                                      </div>
-                                    ) : (
+                                    {(() => {
+                                      // Show logo if there's a preview or if editValues.image_url is set (not empty)
+                                      const shouldShowLogo = imagePreview || (editValues.image_url && editValues.image_url.trim() !== '') || (content.metadata?.logo_url && content.metadata.logo_url.trim() !== '');
+                                      return shouldShowLogo ? (
+                                        <div className="relative inline-block">
+                                          <img
+                                            src={imagePreview || editValues.image_url || content.metadata?.logo_url}
+                                            alt="Preview"
+                                            className="h-16 max-w-[200px] object-contain rounded-lg border border-gray-300 dark:border-gray-700 bg-white p-2"
+                                          />
+                                          <button
+                                            type="button"
+                                            onClick={handleRemoveImage}
+                                            className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+                                            title="Logoyu Sil"
+                                          >
+                                            <X className="w-3 h-3" />
+                                          </button>
+                                        </div>
+                                      ) : null;
+                                    })()}
+                                    {!imagePreview && (!editValues.image_url || editValues.image_url.trim() === '') && (!content.metadata?.logo_url || content.metadata.logo_url.trim() === '') && (
                                       <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4">
                                         <input
                                           ref={fileInputRef}
