@@ -239,7 +239,7 @@ export const en = {
       button: "Get in Touch",
     },
   },
-  projects: {
+  projectsPage: {
     title: "All Projects",
     subtitle: "Explore our complete portfolio of successful projects and innovative solutions.",
     noProjects: "No projects available at the moment.",

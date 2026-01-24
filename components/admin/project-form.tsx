@@ -190,6 +190,7 @@ export function ProjectForm({ project, onClose, onSuccess }: ProjectFormProps) {
             <div className="flex items-center gap-4">
               {imagePreview ? (
                 <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={imagePreview}
                     alt="Preview"

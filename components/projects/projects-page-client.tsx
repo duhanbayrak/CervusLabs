@@ -19,10 +19,10 @@ export function ProjectsPageClient({ projects, error }: ProjectsPageClientProps)
         <SectionTransition>
           <div className="mb-16 border-b border-gray-300 dark:border-gray-800 pb-6">
             <h1 className="text-4xl font-display font-light text-primary dark:text-white mb-4">
-              {t.projects.title}
+              {t.projectsPage.title}
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
-              {t.projects.subtitle}
+              {t.projectsPage.subtitle}
             </p>
           </div>
         </SectionTransition>
@@ -30,13 +30,13 @@ export function ProjectsPageClient({ projects, error }: ProjectsPageClientProps)
         {error ? (
           <div className="text-center py-12">
             <p className="text-red-600 dark:text-red-400">
-              {t.projects.errorLoading}: {error}
+              {t.projectsPage.errorLoading}: {error}
             </p>
           </div>
         ) : projects.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-600 dark:text-gray-400">
-              {t.projects.noProjects}
+              {t.projectsPage.noProjects}
             </p>
           </div>
         ) : (

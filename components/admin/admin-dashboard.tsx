@@ -162,6 +162,7 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           {project.image_url && (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={project.image_url}
                               alt={project.image_alt || project.title}

@@ -239,7 +239,7 @@ export const tr = {
       button: "İletişime Geçin",
     },
   },
-  projects: {
+  projectsPage: {
     title: "Tüm Projeler",
     subtitle: "Başarılı projelerimizin ve yenilikçi çözümlerimizin tam portföyünü keşfedin.",
     noProjects: "Şu anda proje bulunmamaktadır.",
