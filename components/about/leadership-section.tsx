@@ -26,19 +26,27 @@ export function LeadershipSection() {
       const { data } = await getPageContent('leadership');
       if (data) {
         const leadersData: Leader[] = [];
-        for (let i = 0; i < 4; i++) {
-          const nameKey = `leader${i + 1}_name`;
-          const nameContent = data.find(c => c.content_key === nameKey);
-          
-          if (nameContent) {
-            const name = locale === 'tr' ? (nameContent.value_tr || nameContent.value_en || '') : (nameContent.value_en || '');
-            const role = nameContent.metadata?.role || '';
-            const image_url = nameContent.metadata?.image_url || '';
-            if (name) {
-              leadersData.push({ name, role, image_url });
-            }
+        // Find all leader entries dynamically
+        const leaderEntries = data.filter(c => c.content_key.match(/^leader\d+_name$/));
+        
+        // Sort by order_index or by number in content_key
+        leaderEntries.sort((a, b) => {
+          const aMatch = a.content_key.match(/^leader(\d+)_name$/);
+          const bMatch = b.content_key.match(/^leader(\d+)_name$/);
+          const aNum = aMatch ? parseInt(aMatch[1]) : 0;
+          const bNum = bMatch ? parseInt(bMatch[1]) : 0;
+          return aNum - bNum;
+        });
+        
+        leaderEntries.forEach((nameContent) => {
+          const name = locale === 'tr' ? (nameContent.value_tr || nameContent.value_en || '') : (nameContent.value_en || '');
+          const role = nameContent.metadata?.role || '';
+          const image_url = nameContent.metadata?.image_url || '';
+          if (name) {
+            leadersData.push({ name, role, image_url });
           }
-        }
+        });
+        
         if (leadersData.length > 0) {
           setLeaders(leadersData);
         }

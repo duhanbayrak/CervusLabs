@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Save, Loader2, Edit2, Eye, ExternalLink, ChevronDown, ChevronRight, Upload, Image as ImageIcon, X } from 'lucide-react';
+import { Save, Loader2, Edit2, Eye, ExternalLink, ChevronDown, ChevronRight, Upload, Image as ImageIcon, X, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { PageContent } from '@/app/actions/page-content';
-import { getPageContent, updatePageContent } from '@/app/actions/page-content';
+import { getPageContent, updatePageContent, createPageContent } from '@/app/actions/page-content';
 import { refreshAuthToken } from '@/app/actions/auth-refresh';
 import { uploadImage } from '@/app/actions/projects';
 import { useLanguage } from '@/contexts/language-context';
@@ -83,10 +83,11 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{ value_en: string; value_tr: string; image_url?: string }>({
+  const [editValues, setEditValues] = useState<{ value_en: string; value_tr: string; image_url?: string; role?: string }>({
     value_en: '',
     value_tr: '',
     image_url: '',
+    role: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['']));
@@ -151,10 +152,12 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
   const handleEdit = (content: PageContent) => {
     setEditingId(content.id);
     const imageUrl = content.metadata?.image_url || '';
+    const role = content.metadata?.role || '';
     setEditValues({
       value_en: content.value_en || '',
       value_tr: content.value_tr || '',
       image_url: imageUrl,
+      role: role,
     });
     setImagePreview(imageUrl);
     setImageFile(null);
@@ -230,14 +233,22 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       }
     }
 
-    // Merge metadata: preserve existing metadata and update image_url
+    // Merge metadata: preserve existing metadata and update image_url and role
     const metadata: Record<string, any> = { ...existingMetadata };
     if (section === 'leadership') {
       if (finalImageUrl) {
         metadata.image_url = finalImageUrl;
-      } else {
-        // If image_url is empty, remove it from metadata
+      } else if (editValues.image_url === '') {
+        // If image_url is explicitly set to empty, remove it from metadata
         delete metadata.image_url;
+      }
+      // Update role if provided
+      if (editValues.role !== undefined) {
+        if (editValues.role.trim()) {
+          metadata.role = editValues.role.trim();
+        } else {
+          delete metadata.role;
+        }
       }
     }
 
@@ -263,11 +274,45 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
 
   const handleCancel = () => {
     setEditingId(null);
-    setEditValues({ value_en: '', value_tr: '', image_url: '' });
+    setEditValues({ value_en: '', value_tr: '', image_url: '', role: '' });
     setImageFile(null);
     setImagePreview('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const handleAddLeader = async () => {
+    // Find the highest leader number
+    const leaderNumbers = contents
+      .filter(c => c.content_key.match(/^leader(\d+)_name$/))
+      .map(c => {
+        const match = c.content_key.match(/^leader(\d+)_name$/);
+        return match ? parseInt(match[1]) : 0;
+      });
+    
+    const nextNumber = leaderNumbers.length > 0 ? Math.max(...leaderNumbers) + 1 : 1;
+    const contentKey = `leader${nextNumber}_name`;
+    
+    setSaving('new');
+    setError(null);
+    
+    const { data, error: createError } = await createPageContent({
+      section: 'leadership',
+      content_key: contentKey,
+      value_en: `Leader ${nextNumber}`,
+      value_tr: `Lider ${nextNumber}`,
+      order_index: nextNumber,
+      metadata: { role: '' },
+    });
+
+    if (createError) {
+      setError(createError);
+      setSaving(null);
+    } else {
+      await loadContents();
+      router.refresh();
+      setSaving(null);
     }
   };
 
@@ -330,16 +375,37 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
             </p>
           )}
         </div>
-        <a
-          href={finalPreviewUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary dark:text-white border border-primary rounded-lg hover:bg-primary/10 transition-colors whitespace-nowrap"
-        >
-          <Eye className="w-4 h-4" />
-          <span>Sayfada Görüntüle</span>
-          <ExternalLink className="w-3 h-3" />
-        </a>
+        <div className="flex items-center gap-2">
+          {section === 'leadership' && (
+            <button
+              onClick={handleAddLeader}
+              disabled={saving === 'new'}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {saving === 'new' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Ekleniyor...</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  <span>Yeni Lider Ekle</span>
+                </>
+              )}
+            </button>
+          )}
+          <a
+            href={finalPreviewUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary dark:text-white border border-primary rounded-lg hover:bg-primary/10 transition-colors whitespace-nowrap"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Sayfada Görüntüle</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
       </div>
 
       {error && (
@@ -397,6 +463,23 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                             </div>
                             {editingId === content.id ? (
                               <div className="space-y-3 mt-3">
+                                {/* Role field for leadership section */}
+                                {section === 'leadership' && content.content_key.includes('_name') && (
+                                  <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                      Görev (Role)
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={editValues.role || ''}
+                                      onChange={(e) =>
+                                        setEditValues({ ...editValues, role: e.target.value })
+                                      }
+                                      className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm text-gray-900 dark:text-white"
+                                      placeholder="Örn: Chief Executive Officer"
+                                    />
+                                  </div>
+                                )}
                                 {/* Image upload for leadership section */}
                                 {section === 'leadership' && content.content_key.includes('_name') && (
                                   <div>
@@ -492,6 +575,15 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                               </div>
                             ) : (
                               <div className="mt-2 space-y-2">
+                                {/* Show role for leadership */}
+                                {section === 'leadership' && content.content_key.includes('_name') && content.metadata?.role && (
+                                  <div className="mb-2">
+                                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Görev:</span>{' '}
+                                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                                      {content.metadata.role}
+                                    </span>
+                                  </div>
+                                )}
                                 {/* Show image preview for leadership */}
                                 {section === 'leadership' && content.content_key.includes('_name') && content.metadata?.image_url && (
                                   <div className="mb-3">
