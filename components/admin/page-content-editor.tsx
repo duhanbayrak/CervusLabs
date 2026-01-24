@@ -207,7 +207,7 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
   const handleRemoveImage = () => {
     setImageFile(null);
     setImagePreview('');
-    setEditValues({ ...editValues, image_url: '' });
+    setEditValues(prev => ({ ...prev, image_url: '' }));
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -237,12 +237,14 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
     const metadata: Record<string, any> = { ...existingMetadata };
     if (section === 'leadership') {
       // Always update image_url based on finalImageUrl
-      // If finalImageUrl is empty string, remove it from metadata
-      if (finalImageUrl && finalImageUrl.trim()) {
+      // If finalImageUrl is empty string or null/undefined, remove it from metadata
+      if (finalImageUrl && finalImageUrl.trim() && finalImageUrl !== '') {
         metadata.image_url = finalImageUrl.trim();
       } else {
         // Explicitly remove image_url from metadata if it's empty
-        delete metadata.image_url;
+        if ('image_url' in metadata) {
+          delete metadata.image_url;
+        }
       }
       // Update role if provided
       if (editValues.role !== undefined) {
@@ -488,23 +490,28 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                                       Lider Fotoğrafı
                                     </label>
-                                    {(imagePreview || content.metadata?.image_url) ? (
-                                      <div className="relative inline-block">
-                                        <img
-                                          src={imagePreview || content.metadata?.image_url}
-                                          alt="Preview"
-                                          className="w-32 h-40 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
-                                        />
-                                        <button
-                                          type="button"
-                                          onClick={handleRemoveImage}
-                                          className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                                          title="Fotoğrafı Sil"
-                                        >
-                                          <X className="w-3 h-3" />
-                                        </button>
-                                      </div>
-                                    ) : (
+                                    {(() => {
+                                      // Show image if there's a preview or if editValues.image_url is set (not empty)
+                                      const shouldShowImage = imagePreview || (editValues.image_url && editValues.image_url.trim() !== '');
+                                      return shouldShowImage ? (
+                                        <div className="relative inline-block">
+                                          <img
+                                            src={imagePreview || editValues.image_url || content.metadata?.image_url}
+                                            alt="Preview"
+                                            className="w-32 h-40 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
+                                          />
+                                          <button
+                                            type="button"
+                                            onClick={handleRemoveImage}
+                                            className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+                                            title="Fotoğrafı Sil"
+                                          >
+                                            <X className="w-3 h-3" />
+                                          </button>
+                                        </div>
+                                      ) : null;
+                                    })()}
+                                    {!imagePreview && (!editValues.image_url || editValues.image_url.trim() === '') && (
                                       <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4">
                                         <input
                                           ref={fileInputRef}
