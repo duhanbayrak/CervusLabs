@@ -111,14 +111,14 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 border-b-2 border-gray-200 dark:border-gray-800">
-          <nav className="flex gap-6">
+        <div className="mb-8 bg-white dark:bg-gray-900/50 rounded-lg p-2 border border-gray-200 dark:border-gray-800">
+          <nav className="flex gap-2">
             <button
               onClick={() => setActiveTab('projects')}
-              className={`px-6 py-3 text-base font-medium border-b-2 transition-colors flex items-center gap-2 ${
+              className={`flex-1 px-6 py-3 text-base font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
                 activeTab === 'projects'
-                  ? 'border-primary text-primary dark:text-white font-semibold'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white'
+                  ? 'bg-primary text-white shadow-md'
+                  : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white'
               }`}
             >
               <Folder className="w-5 h-5" />
@@ -126,10 +126,10 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
             </button>
             <button
               onClick={() => setActiveTab('content')}
-              className={`px-6 py-3 text-base font-medium border-b-2 transition-colors flex items-center gap-2 ${
+              className={`flex-1 px-6 py-3 text-base font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
                 activeTab === 'content'
-                  ? 'border-primary text-primary dark:text-white font-semibold'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white'
+                  ? 'bg-primary text-white shadow-md'
+                  : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white'
               }`}
             >
               <FileText className="w-5 h-5" />
