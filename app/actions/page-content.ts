@@ -78,8 +78,22 @@ export async function updatePageContent(
       
       if (currentData) {
         const existingMetadata = currentData.metadata || {};
-        // Merge existing metadata with new metadata
-        updates.metadata = { ...existingMetadata, ...updates.metadata };
+        // If updates.metadata is null, it means we want to clear metadata
+        if (updates.metadata === null) {
+          updates.metadata = null;
+        } else {
+          // Merge existing metadata with new metadata
+          // If a key is explicitly deleted (undefined), remove it
+          const mergedMetadata = { ...existingMetadata };
+          Object.keys(updates.metadata).forEach(key => {
+            if (updates.metadata![key] === undefined) {
+              delete mergedMetadata[key];
+            } else {
+              mergedMetadata[key] = updates.metadata![key];
+            }
+          });
+          updates.metadata = mergedMetadata;
+        }
       }
     }
     

@@ -222,7 +222,7 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
     const existingMetadata = currentContent?.metadata || {};
     
     // If there's a new image file, upload it first
-    let finalImageUrl = editValues.image_url;
+    let finalImageUrl = editValues.image_url || '';
     if (imageFile) {
       const uploadResult = await handleImageUpload(id);
       if (uploadResult) {
@@ -236,10 +236,12 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
     // Merge metadata: preserve existing metadata and update image_url and role
     const metadata: Record<string, any> = { ...existingMetadata };
     if (section === 'leadership') {
-      if (finalImageUrl) {
-        metadata.image_url = finalImageUrl;
-      } else if (editValues.image_url === '') {
-        // If image_url is explicitly set to empty, remove it from metadata
+      // Always update image_url based on finalImageUrl
+      // If finalImageUrl is empty string, remove it from metadata
+      if (finalImageUrl && finalImageUrl.trim()) {
+        metadata.image_url = finalImageUrl.trim();
+      } else {
+        // Explicitly remove image_url from metadata if it's empty
         delete metadata.image_url;
       }
       // Update role if provided
@@ -486,10 +488,10 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                                       Lider Fotoğrafı
                                     </label>
-                                    {imagePreview ? (
+                                    {(imagePreview || content.metadata?.image_url) ? (
                                       <div className="relative inline-block">
                                         <img
-                                          src={imagePreview}
+                                          src={imagePreview || content.metadata?.image_url}
                                           alt="Preview"
                                           className="w-32 h-40 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
                                         />
@@ -497,6 +499,7 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                           type="button"
                                           onClick={handleRemoveImage}
                                           className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                          title="Fotoğrafı Sil"
                                         >
                                           <X className="w-3 h-3" />
                                         </button>
