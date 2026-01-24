@@ -126,7 +126,7 @@ export async function deleteProject(id: string) {
   }
 }
 
-export async function uploadImage(formData: FormData): Promise<{ url: string | null; error: string | null }> {
+export async function uploadImage(formData: FormData, bucket: string = 'portfolio-images'): Promise<{ url: string | null; error: string | null }> {
   try {
     const supabase = await createClient();
     
@@ -138,14 +138,14 @@ export async function uploadImage(formData: FormData): Promise<{ url: string | n
     // Generate unique filename
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = fileName; // Just the filename, bucket is already 'portfolio-images'
+    const filePath = fileName;
 
     // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     const { data, error } = await supabase.storage
-      .from('portfolio-images')
+      .from(bucket)
       .upload(filePath, buffer, {
         contentType: file.type,
         upsert: false,
@@ -155,7 +155,7 @@ export async function uploadImage(formData: FormData): Promise<{ url: string | n
 
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('portfolio-images')
+      .from(bucket)
       .getPublicUrl(data.path);
 
     return { url: urlData.publicUrl, error: null };

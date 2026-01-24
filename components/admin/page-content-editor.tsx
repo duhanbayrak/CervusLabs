@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Save, Loader2, Edit2, Eye, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Save, Loader2, Edit2, Eye, ExternalLink, ChevronDown, ChevronRight, Upload, Image as ImageIcon, X } from 'lucide-react';
 import { PageContent } from '@/app/actions/page-content';
 import { getPageContent, updatePageContent } from '@/app/actions/page-content';
 import { refreshAuthToken } from '@/app/actions/auth-refresh';
+import { uploadImage } from '@/app/actions/projects';
 import { useLanguage } from '@/contexts/language-context';
 
 interface PageContentEditorProps {
@@ -80,12 +81,17 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{ value_en: string; value_tr: string }>({
+  const [editValues, setEditValues] = useState<{ value_en: string; value_tr: string; image_url?: string }>({
     value_en: '',
     value_tr: '',
+    image_url: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['']));
+  const [uploadingImage, setUploadingImage] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const config = SECTION_CONFIG[section] || { description: '', previewUrl: '/' };
   const finalDescription = description || config.description;
@@ -142,19 +148,83 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
 
   const handleEdit = (content: PageContent) => {
     setEditingId(content.id);
+    const imageUrl = content.metadata?.image_url || '';
     setEditValues({
       value_en: content.value_en || '',
       value_tr: content.value_tr || '',
+      image_url: imageUrl,
     });
+    setImagePreview(imageUrl);
+    setImageFile(null);
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Görsel boyutu 5MB\'dan küçük olmalıdır');
+        return;
+      }
+      setImageFile(file);
+      setError('');
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageUpload = async (contentId: string) => {
+    if (!imageFile) return;
+
+    setUploadingImage(contentId);
+    setError('');
+
+    const formData = new FormData();
+    formData.append('file', imageFile);
+
+    const { url, error: uploadError } = await uploadImage(formData, 'leadership-images');
+
+    setUploadingImage(null);
+
+    if (uploadError || !url) {
+      setError(uploadError || 'Görsel yüklenemedi');
+      return;
+    }
+
+    setEditValues({ ...editValues, image_url: url });
+    setImagePreview(url);
+    setImageFile(null);
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview('');
+    setEditValues({ ...editValues, image_url: '' });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleSave = async (id: string) => {
     setSaving(id);
     setError(null);
     
+    // If there's a new image file, upload it first
+    if (imageFile) {
+      await handleImageUpload(id);
+    }
+
+    const metadata: Record<string, any> = {};
+    if (section === 'leadership' && editValues.image_url) {
+      metadata.image_url = editValues.image_url;
+    }
+
     const { data, error: saveError } = await updatePageContent(id, {
       value_en: editValues.value_en || null,
       value_tr: editValues.value_tr || null,
+      metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
     });
 
     if (saveError) {
@@ -162,6 +232,8 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       setSaving(null);
     } else {
       setEditingId(null);
+      setImageFile(null);
+      setImagePreview('');
       await loadContents();
       setSaving(null);
     }
@@ -169,7 +241,12 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
 
   const handleCancel = () => {
     setEditingId(null);
-    setEditValues({ value_en: '', value_tr: '' });
+    setEditValues({ value_en: '', value_tr: '', image_url: '' });
+    setImageFile(null);
+    setImagePreview('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   // Group contents by prefix (e.g., stat1, stat2, service1, etc.)
@@ -298,6 +375,70 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                             </div>
                             {editingId === content.id ? (
                               <div className="space-y-3 mt-3">
+                                {/* Image upload for leadership section */}
+                                {section === 'leadership' && content.content_key.includes('_name') && (
+                                  <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                      Lider Fotoğrafı
+                                    </label>
+                                    {imagePreview ? (
+                                      <div className="relative inline-block">
+                                        <img
+                                          src={imagePreview}
+                                          alt="Preview"
+                                          className="w-32 h-40 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={handleRemoveImage}
+                                          className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                        >
+                                          <X className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4">
+                                        <input
+                                          ref={fileInputRef}
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={handleImageSelect}
+                                          className="hidden"
+                                          id={`image-upload-${content.id}`}
+                                        />
+                                        <label
+                                          htmlFor={`image-upload-${content.id}`}
+                                          className="flex flex-col items-center justify-center cursor-pointer"
+                                        >
+                                          <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
+                                          <span className="text-xs text-gray-600 dark:text-gray-400">
+                                            Fotoğraf Yükle (Max 5MB)
+                                          </span>
+                                        </label>
+                                      </div>
+                                    )}
+                                    {imageFile && !imagePreview && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleImageUpload(content.id)}
+                                        disabled={uploadingImage === content.id}
+                                        className="mt-2 px-3 py-1 text-xs bg-primary text-white rounded hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1"
+                                      >
+                                        {uploadingImage === content.id ? (
+                                          <>
+                                            <Loader2 className="w-3 h-3 animate-spin" />
+                                            Yükleniyor...
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Upload className="w-3 h-3" />
+                                            Yükle
+                                          </>
+                                        )}
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
                                 <div>
                                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     İngilizce (English)
@@ -329,6 +470,16 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                               </div>
                             ) : (
                               <div className="mt-2 space-y-2">
+                                {/* Show image preview for leadership */}
+                                {section === 'leadership' && content.content_key.includes('_name') && content.metadata?.image_url && (
+                                  <div className="mb-3">
+                                    <img
+                                      src={content.metadata.image_url}
+                                      alt={content.value_en || content.value_tr || 'Leader'}
+                                      className="w-24 h-32 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
+                                    />
+                                  </div>
+                                )}
                                 <div className="text-sm">
                                   <span className="font-medium text-gray-500 dark:text-gray-400">EN:</span>{' '}
                                   <span className="text-gray-700 dark:text-gray-300">

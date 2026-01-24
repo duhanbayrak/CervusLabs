@@ -9,6 +9,7 @@ import { getPageContent } from "@/app/actions/page-content";
 interface Leader {
   name: string;
   role: string;
+  image_url?: string;
 }
 
 export function LeadershipSection() {
@@ -32,8 +33,9 @@ export function LeadershipSection() {
           if (nameContent) {
             const name = locale === 'tr' ? (nameContent.value_tr || nameContent.value_en || '') : (nameContent.value_en || '');
             const role = nameContent.metadata?.role || '';
+            const image_url = nameContent.metadata?.image_url || '';
             if (name) {
-              leadersData.push({ name, role });
+              leadersData.push({ name, role, image_url });
             }
           }
         }
@@ -65,9 +67,17 @@ export function LeadershipSection() {
               <SectionTransition key={leader.name} delay={0.2 + index * 0.1}>
                 <div className="group">
                   <div className="relative overflow-hidden aspect-[4/5] bg-gray-100 dark:bg-white/5 mb-4 rounded-sm">
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-300 dark:text-gray-600 group-hover:scale-105 transition-transform duration-500">
-                      <User className="w-24 h-24" />
-                    </div>
+                    {leader.image_url ? (
+                      <img
+                        src={leader.image_url}
+                        alt={leader.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-300 dark:text-gray-600 group-hover:scale-105 transition-transform duration-500">
+                        <User className="w-24 h-24" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-300" />
                   </div>
                   <h3 className="text-lg font-display font-bold text-primary dark:text-white">
