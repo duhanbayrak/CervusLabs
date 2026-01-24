@@ -14,15 +14,12 @@ interface Leader {
 
 export function LeadershipSection() {
   const { t, locale } = useLanguage();
-  const [leaders, setLeaders] = useState<Leader[]>([
-    { name: "Dr. Elena Vos", role: "Chief Executive Officer" },
-    { name: "Marcus Chen", role: "CTO & Lead Architect" },
-    { name: "Sarah O'Neil", role: "Head of Product Design" },
-    { name: "James Thorne", role: "VP of Engineering" },
-  ]);
+  const [leaders, setLeaders] = useState<Leader[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadLeaders = async () => {
+      setLoading(true);
       const { data } = await getPageContent('leadership');
       if (data) {
         const leadersData: Leader[] = [];
@@ -47,10 +44,11 @@ export function LeadershipSection() {
           }
         });
         
-        if (leadersData.length > 0) {
-          setLeaders(leadersData);
-        }
+        setLeaders(leadersData);
+      } else {
+        setLeaders([]);
       }
+      setLoading(false);
     };
     loadLeaders();
   }, [locale]);
@@ -70,34 +68,46 @@ export function LeadershipSection() {
               </div>
             </div>
           </SectionTransition>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {leaders.map((leader, index) => (
-              <SectionTransition key={leader.name} delay={0.2 + index * 0.1}>
-                <div className="group">
-                  <div className="relative overflow-hidden aspect-[4/5] bg-gray-100 dark:bg-white/5 mb-4 rounded-sm">
-                    {leader.image_url ? (
-                      <img
-                        src={leader.image_url}
-                        alt={leader.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-300 dark:text-gray-600 group-hover:scale-105 transition-transform duration-500">
-                        <User className="w-24 h-24" />
-                      </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 dark:text-gray-400">Yükleniyor...</p>
+            </div>
+          ) : leaders.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 dark:text-gray-400">Henüz lider eklenmemiş.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {leaders.map((leader, index) => (
+                <SectionTransition key={leader.name} delay={0.2 + index * 0.1}>
+                  <div className="group">
+                    <div className="relative overflow-hidden aspect-[4/5] bg-gray-100 dark:bg-white/5 mb-4 rounded-sm">
+                      {leader.image_url ? (
+                        <img
+                          src={leader.image_url}
+                          alt={leader.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-gray-300 dark:text-gray-600 group-hover:scale-105 transition-transform duration-500">
+                          <User className="w-24 h-24" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-300" />
+                    </div>
+                    <h3 className="text-lg font-display font-bold text-primary dark:text-white">
+                      {leader.name}
+                    </h3>
+                    {leader.role && (
+                      <p className="text-xs font-mono uppercase tracking-wider text-gray-500">
+                        {leader.role}
+                      </p>
                     )}
-                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-300" />
                   </div>
-                  <h3 className="text-lg font-display font-bold text-primary dark:text-white">
-                    {leader.name}
-                  </h3>
-                  <p className="text-xs font-mono uppercase tracking-wider text-gray-500">
-                    {leader.role}
-                  </p>
-                </div>
-              </SectionTransition>
-            ))}
-          </div>
+                </SectionTransition>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </SectionTransition>
