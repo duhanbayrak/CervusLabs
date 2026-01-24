@@ -22,38 +22,41 @@ export function TrustedBySection() {
         const { data, error } = await getPageContent('trusted-by');
         if (error) {
           console.error('Error loading companies:', error);
+          // Don't set empty array on error, might be temporary
           setCompanies([]);
           setLoading(false);
           return;
         }
         
-        if (data && data.length > 0) {
+        if (data && Array.isArray(data) && data.length > 0) {
           const companiesData: Company[] = [];
           // Find all company entries dynamically
-          const companyEntries = data.filter(c => c.content_key.match(/^company\d+_name$/));
+          const companyEntries = data.filter(c => c.content_key && c.content_key.match(/^company\d+_name$/));
           
-          // Sort by order_index or by number in content_key
-          companyEntries.sort((a, b) => {
-            // First try order_index
-            if (a.order_index !== b.order_index) {
-              return a.order_index - b.order_index;
-            }
-            // Fallback to number in content_key
-            const aMatch = a.content_key.match(/^company(\d+)_name$/);
-            const bMatch = b.content_key.match(/^company(\d+)_name$/);
-            const aNum = aMatch ? parseInt(aMatch[1]) : 0;
-            const bNum = bMatch ? parseInt(bMatch[1]) : 0;
-            return aNum - bNum;
-          });
-          
-          companyEntries.forEach((nameContent) => {
-            const name = locale === 'tr' ? (nameContent.value_tr || nameContent.value_en || '') : (nameContent.value_en || '');
-            const logo_url = nameContent.metadata?.logo_url || '';
-            // Add company if it has a name (logo is optional)
-            if (name && name.trim()) {
-              companiesData.push({ name: name.trim(), logo_url: logo_url?.trim() || '' });
-            }
-          });
+          if (companyEntries.length > 0) {
+            // Sort by order_index or by number in content_key
+            companyEntries.sort((a, b) => {
+              // First try order_index
+              if (a.order_index !== b.order_index) {
+                return (a.order_index || 0) - (b.order_index || 0);
+              }
+              // Fallback to number in content_key
+              const aMatch = a.content_key.match(/^company(\d+)_name$/);
+              const bMatch = b.content_key.match(/^company(\d+)_name$/);
+              const aNum = aMatch ? parseInt(aMatch[1]) : 0;
+              const bNum = bMatch ? parseInt(bMatch[1]) : 0;
+              return aNum - bNum;
+            });
+            
+            companyEntries.forEach((nameContent) => {
+              const name = locale === 'tr' ? (nameContent.value_tr || nameContent.value_en || '') : (nameContent.value_en || '');
+              const logo_url = nameContent.metadata?.logo_url || '';
+              // Add company if it has a name (logo is optional)
+              if (name && name.trim()) {
+                companiesData.push({ name: name.trim(), logo_url: logo_url?.trim() || '' });
+              }
+            });
+          }
           
           setCompanies(companiesData);
         } else {

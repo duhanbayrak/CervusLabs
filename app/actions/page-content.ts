@@ -26,9 +26,6 @@ export async function getPageContent(section?: string): Promise<{ data: PageCont
   try {
     const supabase = await createClient();
     
-    // Try to get session, but don't fail if there's no session (for public pages)
-    const { data: { session } } = await supabase.auth.getSession();
-    
     let query = supabase
       .from('page_content')
       .select('*')
@@ -41,23 +38,24 @@ export async function getPageContent(section?: string): Promise<{ data: PageCont
     const { data, error } = await query;
     
     if (error) {
-      // Check if it's a JWT expired error (only for authenticated requests)
-      if (session && (error.message?.includes('expired') || error.message?.includes('JWT'))) {
-        return { data: null, error: 'JWT expired. Please log in again.' };
+      // Log error for debugging
+      console.error('getPageContent error:', error);
+      // Check if it's a JWT expired error
+      if (error.message?.includes('expired') || error.message?.includes('JWT')) {
+        // Try to get session to see if it's an auth issue
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          return { data: null, error: 'JWT expired. Please log in again.' };
+        }
       }
-      // For public access, just return the error
-      throw error;
+      // For public access or other errors, return the error message
+      return { data: null, error: error.message };
     }
     
     return { data, error: null };
   } catch (error: any) {
-    // Only return JWT error if we have a session
-    const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session && (error.message?.includes('expired') || error.message?.includes('JWT'))) {
-      return { data: null, error: 'JWT expired. Please log in again.' };
-    }
-    return { data: null, error: error.message };
+    console.error('getPageContent exception:', error);
+    return { data: null, error: error.message || 'Unknown error' };
   }
 }
 
