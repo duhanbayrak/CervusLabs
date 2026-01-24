@@ -10,11 +10,19 @@ import { AntlerMouseEffect } from "@/components/ui/AntlerMouseEffect";
 export function HeroSection() {
   const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
+  const [animationKey, setAnimationKey] = useState(0);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number; duration: number }>>([]);
   const mousePositionRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    // Set mounted to true immediately on client side
     setMounted(true);
+    
+    // Force animation restart by updating key after mount
+    const timer = setTimeout(() => {
+      setAnimationKey(prev => prev + 1);
+    }, 100);
+    
     // Generate particles only on client side - optimized count (reduced from 50 to 30)
     const particleData = Array.from({ length: 30 }, (_, i) => ({
       id: i,
@@ -24,6 +32,8 @@ export function HeroSection() {
       duration: Math.random() * 10 + 5,
     }));
     setParticles(particleData);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   // Branching lines from antlers - Minimalist optimized version
@@ -117,98 +127,101 @@ export function HeroSection() {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="mb-10 relative w-56 h-56 md:w-72 md:h-72 lg:w-[320px] lg:h-[320px] animate-draw opacity-90 hover:opacity-100 transition-opacity duration-500 z-10"
+        className="mb-10 relative w-56 h-56 md:w-72 md:h-72 lg:w-[320px] lg:h-[320px] opacity-90 hover:opacity-100 transition-opacity duration-500 z-10"
       >
         <div className="absolute inset-0 bg-primary/5 dark:bg-white/5 blur-3xl rounded-full -z-10" />
         
         {/* Branching Lines SVG - More prominent */}
-        <svg
-          className="absolute inset-0 w-full h-full text-primary/60 dark:text-white/40 pointer-events-none"
-          fill="none"
-          viewBox="0 0 200 200"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{ zIndex: -1 }}
-        >
-          {/* Main branches - Animated */}
-          {branchingLines.map((line) => {
-            const path = `M ${line.startX} ${line.startY} L ${line.endX} ${line.endY}`;
-            return (
-              <motion.path
-                key={line.id}
-                d={path}
-                stroke="currentColor"
-                strokeWidth="1.2"
-                strokeDasharray="4 4"
-                fill="none"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ 
-                  pathLength: [0, 1, 0.6],
-                  opacity: [0, 0.8, 0.6, 0.4, 0.2],
-                }}
-                transition={{
-                  pathLength: {
-                    duration: 4,
-                    delay: line.delay,
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    ease: "easeInOut",
-                  },
-                  opacity: {
-                    duration: 5,
-                    delay: line.delay,
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    ease: [0.4, 0, 0.2, 1],
-                    times: [0, 0.2, 0.4, 0.7, 1],
-                  },
-                }}
-              />
-            );
-          })}
-          {/* Secondary branching - Animated */}
-          {branchingLines.slice(0, 6).map((line) => {
-            const midX = (line.startX + line.endX) / 2;
-            const midY = (line.startY + line.endY) / 2;
-            const angle = Math.atan2(line.endY - line.startY, line.endX - line.startX);
-            const perpAngle = angle + Math.PI / 2;
-            const branchLength = 12 + (line.id % 3) * 3;
-            const branchX = midX + Math.cos(perpAngle) * branchLength;
-            const branchY = midY + Math.sin(perpAngle) * branchLength;
-            const branchPath = `M ${midX} ${midY} L ${Math.max(0, Math.min(200, branchX))} ${Math.max(0, Math.min(200, branchY))}`;
-            return (
-              <motion.path
-                key={`branch-${line.id}`}
-                d={branchPath}
-                stroke="currentColor"
-                strokeWidth="0.7"
-                strokeDasharray="2 3"
-                fill="none"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ 
-                  pathLength: [0, 1, 0.5],
-                  opacity: [0, 0.6, 0.5, 0.3, 0.15],
-                }}
-                transition={{
-                  pathLength: {
-                    duration: 3.5,
-                    delay: line.delay + 0.8,
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    ease: "easeInOut",
-                  },
-                  opacity: {
-                    duration: 4.5,
-                    delay: line.delay + 0.8,
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    ease: [0.4, 0, 0.2, 1],
-                    times: [0, 0.2, 0.4, 0.7, 1],
-                  },
-                }}
-              />
-            );
-          })}
-        </svg>
+        {mounted && (
+          <svg
+            className="absolute inset-0 w-full h-full text-primary/60 dark:text-white/40 pointer-events-none"
+            fill="none"
+            viewBox="0 0 200 200"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ zIndex: -1 }}
+            key={`branching-svg-${animationKey}`}
+          >
+            {/* Main branches - Animated */}
+            {branchingLines.map((line) => {
+              const path = `M ${line.startX} ${line.startY} L ${line.endX} ${line.endY}`;
+              return (
+                <motion.path
+                  key={`${line.id}-${animationKey}`}
+                  d={path}
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeDasharray="4 4"
+                  fill="none"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ 
+                    pathLength: [0, 1, 0.6],
+                    opacity: [0, 0.8, 0.6, 0.4, 0.2],
+                  }}
+                  transition={{
+                    pathLength: {
+                      duration: 4,
+                      delay: line.delay,
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      ease: "easeInOut",
+                    },
+                    opacity: {
+                      duration: 5,
+                      delay: line.delay,
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      ease: [0.4, 0, 0.2, 1],
+                      times: [0, 0.2, 0.4, 0.7, 1],
+                    },
+                  }}
+                />
+              );
+            })}
+            {/* Secondary branching - Animated */}
+            {branchingLines.slice(0, 6).map((line) => {
+              const midX = (line.startX + line.endX) / 2;
+              const midY = (line.startY + line.endY) / 2;
+              const angle = Math.atan2(line.endY - line.startY, line.endX - line.startX);
+              const perpAngle = angle + Math.PI / 2;
+              const branchLength = 12 + (line.id % 3) * 3;
+              const branchX = midX + Math.cos(perpAngle) * branchLength;
+              const branchY = midY + Math.sin(perpAngle) * branchLength;
+              const branchPath = `M ${midX} ${midY} L ${Math.max(0, Math.min(200, branchX))} ${Math.max(0, Math.min(200, branchY))}`;
+              return (
+                <motion.path
+                  key={`branch-${line.id}-${animationKey}`}
+                  d={branchPath}
+                  stroke="currentColor"
+                  strokeWidth="0.7"
+                  strokeDasharray="2 3"
+                  fill="none"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ 
+                    pathLength: [0, 1, 0.5],
+                    opacity: [0, 0.6, 0.5, 0.3, 0.15],
+                  }}
+                  transition={{
+                    pathLength: {
+                      duration: 3.5,
+                      delay: line.delay + 0.8,
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      ease: "easeInOut",
+                    },
+                    opacity: {
+                      duration: 4.5,
+                      delay: line.delay + 0.8,
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      ease: [0.4, 0, 0.2, 1],
+                      times: [0, 0.2, 0.4, 0.7, 1],
+                    },
+                  }}
+                />
+              );
+            })}
+          </svg>
+        )}
 
         {/* Deer Logo SVG */}
         <svg
