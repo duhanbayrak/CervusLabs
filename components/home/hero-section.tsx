@@ -18,11 +18,6 @@ export function HeroSection() {
     // Set mounted to true immediately on client side
     setMounted(true);
     
-    // Force animation restart by updating key after mount
-    const timer = setTimeout(() => {
-      setAnimationKey(prev => prev + 1);
-    }, 100);
-    
     // Generate particles only on client side - optimized count (reduced from 50 to 30)
     const particleData = Array.from({ length: 30 }, (_, i) => ({
       id: i,
@@ -33,7 +28,15 @@ export function HeroSection() {
     }));
     setParticles(particleData);
     
-    return () => clearTimeout(timer);
+    // Force animation restart using requestAnimationFrame to ensure DOM is ready
+    const rafId = requestAnimationFrame(() => {
+      // Use double RAF to ensure animations start after render
+      requestAnimationFrame(() => {
+        setAnimationKey(prev => prev + 1);
+      });
+    });
+    
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
   // Branching lines from antlers - Minimalist optimized version
@@ -133,13 +136,16 @@ export function HeroSection() {
         
         {/* Branching Lines SVG - More prominent */}
         {mounted && (
-          <svg
+          <motion.svg
             className="absolute inset-0 w-full h-full text-primary/60 dark:text-white/40 pointer-events-none"
             fill="none"
             viewBox="0 0 200 200"
             xmlns="http://www.w3.org/2000/svg"
             style={{ zIndex: -1 }}
             key={`branching-svg-${animationKey}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
             {/* Main branches - Animated */}
             {branchingLines.map((line) => {
@@ -160,14 +166,14 @@ export function HeroSection() {
                   transition={{
                     pathLength: {
                       duration: 4,
-                      delay: line.delay,
+                      delay: line.delay + 0.1,
                       repeat: Infinity,
                       repeatType: "loop",
                       ease: "easeInOut",
                     },
                     opacity: {
                       duration: 5,
-                      delay: line.delay,
+                      delay: line.delay + 0.1,
                       repeat: Infinity,
                       repeatType: "loop",
                       ease: [0.4, 0, 0.2, 1],
@@ -203,14 +209,14 @@ export function HeroSection() {
                   transition={{
                     pathLength: {
                       duration: 3.5,
-                      delay: line.delay + 0.8,
+                      delay: line.delay + 0.9,
                       repeat: Infinity,
                       repeatType: "loop",
                       ease: "easeInOut",
                     },
                     opacity: {
                       duration: 4.5,
-                      delay: line.delay + 0.8,
+                      delay: line.delay + 0.9,
                       repeat: Infinity,
                       repeatType: "loop",
                       ease: [0.4, 0, 0.2, 1],
@@ -220,7 +226,7 @@ export function HeroSection() {
                 />
               );
             })}
-          </svg>
+          </motion.svg>
         )}
 
         {/* Deer Logo SVG */}
