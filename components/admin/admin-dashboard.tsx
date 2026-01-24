@@ -293,6 +293,12 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
                 description="About sayfasındaki değerler bölümünü düzenleyin."
                 previewUrl="/about"
               />
+              <PageContentEditor 
+                section="trusted-by" 
+                sectionLabel="Güvenilen Şirketler (Trusted By)" 
+                description="About sayfasındaki 'Güvenilen Şirketler' bölümünü düzenleyin. Şirket isimleri ve logolarını ekleyin."
+                previewUrl="/about"
+              />
             </div>
           </div>
         )}

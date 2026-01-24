@@ -38,6 +38,11 @@ const SECTION_CONFIG: Record<string, { description: string; previewUrl: string; 
     previewUrl: '/about',
     groupBy: 'value',
   },
+  'trusted-by': {
+    description: 'About sayfasındaki "Güvenilen Şirketler" bölümünü düzenleyin. Şirket isimleri ve logolarını ekleyin.',
+    previewUrl: '/about',
+    groupBy: 'company',
+  },
 };
 
 // Get human-readable labels for content keys
@@ -71,6 +76,11 @@ const getContentLabel = (contentKey: string): string => {
     value2_description: 'Değer 2 - Açıklama',
     value3_title: 'Değer 3 - Başlık',
     value3_description: 'Değer 3 - Açıklama',
+    // Trusted By Companies
+    company1_name: 'Şirket 1 - İsim',
+    company2_name: 'Şirket 2 - İsim',
+    company3_name: 'Şirket 3 - İsim',
+    company4_name: 'Şirket 4 - İsim',
   };
 
   return labels[contentKey] || contentKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -151,7 +161,7 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
 
   const handleEdit = (content: PageContent) => {
     setEditingId(content.id);
-    const imageUrl = content.metadata?.image_url || '';
+    const imageUrl = content.metadata?.image_url || content.metadata?.logo_url || '';
     const role = content.metadata?.role || '';
     setEditValues({
       value_en: content.value_en || '',
@@ -166,8 +176,11 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Görsel boyutu 5MB\'dan küçük olmalıdır');
+      // Different size limits for different sections
+      const maxSize = section === 'trusted-by' ? 2 * 1024 * 1024 : 5 * 1024 * 1024;
+      const maxSizeMB = section === 'trusted-by' ? 2 : 5;
+      if (file.size > maxSize) {
+        setError(`Görsel boyutu ${maxSizeMB}MB'dan küçük olmalıdır`);
         return;
       }
       setImageFile(file);
@@ -189,7 +202,9 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
     const formData = new FormData();
     formData.append('file', imageFile);
 
-    const { url, error: uploadError } = await uploadImage(formData, 'leadership-images');
+    // Use different bucket based on section
+    const bucket = section === 'trusted-by' ? 'company-logos' : 'leadership-images';
+    const { url, error: uploadError } = await uploadImage(formData, bucket);
 
     setUploadingImage(null);
 
@@ -233,7 +248,7 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       }
     }
 
-    // Merge metadata: preserve existing metadata and update image_url and role
+    // Merge metadata: preserve existing metadata and update image_url/logo_url and role
     const metadata: Record<string, any> = { ...existingMetadata };
     if (section === 'leadership') {
       // Always update image_url based on finalImageUrl
@@ -252,6 +267,13 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
         } else {
           metadata.role = undefined;
         }
+      }
+    } else if (section === 'trusted-by') {
+      // For trusted-by section, use logo_url instead of image_url
+      if (finalImageUrl && finalImageUrl.trim() && finalImageUrl !== '') {
+        metadata.logo_url = finalImageUrl.trim();
+      } else {
+        metadata.logo_url = undefined;
       }
     }
 
@@ -315,6 +337,40 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       value_tr: `Lider ${nextNumber}`,
       order_index: nextNumber,
       metadata: { role: '' },
+    });
+
+    if (createError) {
+      setError(createError);
+      setSaving(null);
+    } else {
+      await loadContents();
+      router.refresh();
+      setSaving(null);
+    }
+  };
+
+  const handleAddCompany = async () => {
+    // Find the highest company number
+    const companyNumbers = contents
+      .filter(c => c.content_key.match(/^company(\d+)_name$/))
+      .map(c => {
+        const match = c.content_key.match(/^company(\d+)_name$/);
+        return match ? parseInt(match[1]) : 0;
+      });
+    
+    const nextNumber = companyNumbers.length > 0 ? Math.max(...companyNumbers) + 1 : 1;
+    const contentKey = `company${nextNumber}_name`;
+    
+    setSaving('new');
+    setError(null);
+    
+    const { data, error: createError } = await createPageContent({
+      section: 'trusted-by',
+      content_key: contentKey,
+      value_en: `Company ${nextNumber}`,
+      value_tr: `Şirket ${nextNumber}`,
+      order_index: nextNumber,
+      metadata: { logo_url: '' },
     });
 
     if (createError) {
@@ -406,6 +462,25 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
               )}
             </button>
           )}
+          {section === 'trusted-by' && (
+            <button
+              onClick={handleAddCompany}
+              disabled={saving === 'new'}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {saving === 'new' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Ekleniyor...</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  <span>Yeni Şirket Ekle</span>
+                </>
+              )}
+            </button>
+          )}
           <a
             href={finalPreviewUrl}
             target="_blank"
@@ -489,6 +564,71 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                       className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm text-gray-900 dark:text-white"
                                       placeholder="Örn: Chief Executive Officer"
                                     />
+                                  </div>
+                                )}
+                                {/* Logo upload for trusted-by section */}
+                                {section === 'trusted-by' && content.content_key.includes('_name') && (
+                                  <div>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                      Şirket Logosu
+                                    </label>
+                                    {(imagePreview || content.metadata?.logo_url) ? (
+                                      <div className="relative inline-block">
+                                        <img
+                                          src={imagePreview || content.metadata?.logo_url}
+                                          alt="Preview"
+                                          className="h-16 max-w-[200px] object-contain rounded-lg border border-gray-300 dark:border-gray-700 bg-white p-2"
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={handleRemoveImage}
+                                          className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+                                          title="Logoyu Sil"
+                                        >
+                                          <X className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4">
+                                        <input
+                                          ref={fileInputRef}
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={handleImageSelect}
+                                          className="hidden"
+                                          id={`logo-upload-${content.id}`}
+                                        />
+                                        <label
+                                          htmlFor={`logo-upload-${content.id}`}
+                                          className="flex flex-col items-center justify-center cursor-pointer"
+                                        >
+                                          <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
+                                          <span className="text-xs text-gray-600 dark:text-gray-400">
+                                            Logo Yükle (Max 2MB)
+                                          </span>
+                                        </label>
+                                      </div>
+                                    )}
+                                    {imageFile && !imagePreview && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleImageUpload(content.id)}
+                                        disabled={uploadingImage === content.id}
+                                        className="mt-2 px-3 py-1 text-xs bg-primary text-white rounded hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1"
+                                      >
+                                        {uploadingImage === content.id ? (
+                                          <>
+                                            <Loader2 className="w-3 h-3 animate-spin" />
+                                            Yükleniyor...
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Upload className="w-3 h-3" />
+                                            Yükle
+                                          </>
+                                        )}
+                                      </button>
+                                    )}
                                   </div>
                                 )}
                                 {/* Image upload for leadership section */}
@@ -599,6 +739,16 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                     <span className="text-sm text-gray-700 dark:text-gray-300">
                                       {content.metadata.role}
                                     </span>
+                                  </div>
+                                )}
+                                {/* Show logo preview for trusted-by */}
+                                {section === 'trusted-by' && content.content_key.includes('_name') && content.metadata?.logo_url && (
+                                  <div className="mb-3">
+                                    <img
+                                      src={content.metadata.logo_url}
+                                      alt={content.value_en || content.value_tr || 'Company'}
+                                      className="h-12 max-w-[150px] object-contain rounded-lg border border-gray-300 dark:border-gray-700 bg-white p-2"
+                                    />
                                   </div>
                                 )}
                                 {/* Show image preview for leadership */}
