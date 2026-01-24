@@ -51,10 +51,31 @@ export async function createClient() {
 
   // Set session if tokens exist
   if (finalAccessToken && finalRefreshToken) {
-    await supabase.auth.setSession({
-      access_token: finalAccessToken,
-      refresh_token: finalRefreshToken,
-    });
+    try {
+      const { data, error } = await supabase.auth.setSession({
+        access_token: finalAccessToken,
+        refresh_token: finalRefreshToken,
+      });
+
+      // If session setting failed due to expired token, try to refresh
+      if (error && (error.message?.includes('expired') || error.message?.includes('JWT'))) {
+        try {
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession({
+            refresh_token: finalRefreshToken,
+          });
+
+          if (!refreshError && refreshData?.session) {
+            // Note: We can't set cookies in server-side, but we can return the refreshed session
+            // The client will need to handle cookie updates
+            return supabase;
+          }
+        } catch (refreshErr) {
+          // Refresh failed, will return supabase without valid session
+        }
+      }
+    } catch (err) {
+      // Session setting failed, continue without session
+    }
   }
 
   return supabase;

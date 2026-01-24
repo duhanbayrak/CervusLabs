@@ -29,6 +29,15 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
+  // Check for JWT expired errors and redirect to login
+  useEffect(() => {
+    if (error && (error.includes('JWT expired') || error.includes('expired'))) {
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+    }
+  }, [error, router]);
+
   const refreshProjects = async () => {
     setLoading(true);
     setError(null);

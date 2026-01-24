@@ -26,6 +26,12 @@ export async function getPageContent(section?: string): Promise<{ data: PageCont
   try {
     const supabase = await createClient();
     
+    // Check if session is valid
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      return { data: null, error: 'JWT expired. Please log in again.' };
+    }
+    
     let query = supabase
       .from('page_content')
       .select('*')
@@ -37,10 +43,19 @@ export async function getPageContent(section?: string): Promise<{ data: PageCont
     
     const { data, error } = await query;
     
-    if (error) throw error;
+    if (error) {
+      // Check if it's a JWT expired error
+      if (error.message?.includes('expired') || error.message?.includes('JWT')) {
+        return { data: null, error: 'JWT expired. Please log in again.' };
+      }
+      throw error;
+    }
     
     return { data, error: null };
   } catch (error: any) {
+    if (error.message?.includes('expired') || error.message?.includes('JWT')) {
+      return { data: null, error: 'JWT expired. Please log in again.' };
+    }
     return { data: null, error: error.message };
   }
 }

@@ -53,12 +53,14 @@ export default function LoginPage() {
           user: data.session.user,
         });
         
-        // Set Supabase's own cookie format
-        document.cookie = `sb-${projectRef}-auth-token=${encodeURIComponent(cookieValue)}; path=/; max-age=604800; SameSite=Lax`;
+        // Set Supabase's own cookie format (7 days)
+        const cookieMaxAge = 60 * 60 * 24 * 7; // 7 days in seconds
+        document.cookie = `sb-${projectRef}-auth-token=${encodeURIComponent(cookieValue)}; path=/; max-age=${cookieMaxAge}; SameSite=Lax`;
         
         // Also set our custom cookies for middleware
-        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=3600; SameSite=Lax`;
-        document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=604800; SameSite=Lax`;
+        // Access token: 1 day, Refresh token: 7 days
+        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
+        document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=${cookieMaxAge}; SameSite=Lax`;
         
         // Wait a bit for cookies to be set, then redirect
         await new Promise(resolve => setTimeout(resolve, 200));

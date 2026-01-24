@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Save, Loader2, Edit2 } from 'lucide-react';
 import { PageContent } from '@/app/actions/page-content';
 import { getPageContent, updatePageContent } from '@/app/actions/page-content';
+import { refreshAuthToken } from '@/app/actions/auth-refresh';
 import { useLanguage } from '@/contexts/language-context';
 
 interface PageContentEditorProps {
@@ -28,7 +29,29 @@ export function PageContentEditor({ section, sectionLabel }: PageContentEditorPr
     setError(null);
     const { data, error: fetchError } = await getPageContent(section);
     if (fetchError) {
-      setError(fetchError);
+      // If JWT expired, try to refresh token first
+      if (fetchError.includes('JWT expired') || fetchError.includes('expired')) {
+        const { success } = await refreshAuthToken();
+        if (success) {
+          // Retry after refresh
+          const { data: retryData, error: retryError } = await getPageContent(section);
+          if (retryError) {
+            setError('Session expired. Please log in again.');
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 2000);
+          } else if (retryData) {
+            setContents(retryData);
+          }
+        } else {
+          setError('Session expired. Redirecting to login...');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        }
+      } else {
+        setError(fetchError);
+      }
     } else if (data) {
       setContents(data);
     }
