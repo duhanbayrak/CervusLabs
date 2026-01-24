@@ -111,28 +111,28 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200 dark:border-gray-800">
-          <nav className="flex gap-4">
+        <div className="mb-6 border-b-2 border-gray-200 dark:border-gray-800">
+          <nav className="flex gap-6">
             <button
               onClick={() => setActiveTab('projects')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+              className={`px-6 py-3 text-base font-medium border-b-2 transition-colors flex items-center gap-2 ${
                 activeTab === 'projects'
-                  ? 'border-primary text-primary dark:text-white'
+                  ? 'border-primary text-primary dark:text-white font-semibold'
                   : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white'
               }`}
             >
-              <Folder className="w-4 h-4" />
+              <Folder className="w-5 h-5" />
               Projects
             </button>
             <button
               onClick={() => setActiveTab('content')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+              className={`px-6 py-3 text-base font-medium border-b-2 transition-colors flex items-center gap-2 ${
                 activeTab === 'content'
-                  ? 'border-primary text-primary dark:text-white'
+                  ? 'border-primary text-primary dark:text-white font-semibold'
                   : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white'
               }`}
             >
-              <FileText className="w-4 h-4" />
+              <FileText className="w-5 h-5" />
               Page Content
             </button>
           </nav>
