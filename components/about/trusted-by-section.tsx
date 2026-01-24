@@ -36,8 +36,9 @@ export function TrustedBySection() {
         companyEntries.forEach((nameContent) => {
           const name = locale === 'tr' ? (nameContent.value_tr || nameContent.value_en || '') : (nameContent.value_en || '');
           const logo_url = nameContent.metadata?.logo_url || '';
-          if (name) {
-            companiesData.push({ name, logo_url });
+          // Add company if it has a name (logo is optional)
+          if (name && name.trim()) {
+            companiesData.push({ name: name.trim(), logo_url: logo_url?.trim() || '' });
           }
         });
         
@@ -71,14 +72,26 @@ export function TrustedBySection() {
             <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all">
               {companies.map((company, index) => (
                 <div
-                  key={company.name}
+                  key={`${company.name}-${index}`}
                   className="flex items-center justify-center h-12 max-w-[200px]"
                 >
-                  {company.logo_url ? (
+                  {company.logo_url && company.logo_url.trim() ? (
                     <img
                       src={company.logo_url}
                       alt={company.name}
                       className="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-80 hover:opacity-100 transition-opacity"
+                      onError={(e) => {
+                        // If image fails to load, show company name instead
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          const fallback = document.createElement('span');
+                          fallback.className = 'text-white/50 text-sm font-medium';
+                          fallback.textContent = company.name;
+                          parent.appendChild(fallback);
+                        }
+                      }}
                     />
                   ) : (
                     <span className="text-white/50 text-sm font-medium">{company.name}</span>
