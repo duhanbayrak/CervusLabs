@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { PageContent } from '@/app/actions/page-content';
 import { getPageContent, updatePageContent, createPageContent } from '@/app/actions/page-content';
 import { refreshAuthToken } from '@/app/actions/auth-refresh';
-import { uploadImage } from '@/app/actions/projects';
+import { uploadImage, deleteImageFromStorage } from '@/app/actions/projects';
 import { useLanguage } from '@/contexts/language-context';
 
 interface PageContentEditorProps {
@@ -217,7 +217,8 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       return null;
     }
 
-    setEditValues({ ...editValues, image_url: url });
+    // Use functional form to ensure we're using the latest state
+    setEditValues(prev => ({ ...prev, image_url: url }));
     setImagePreview(url);
     setImageFile(null);
     return url;
@@ -242,8 +243,20 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
     const currentContent = contents.find(c => c.id === id);
     const existingMetadata = currentContent?.metadata || {};
     
+    // Store the old image/logo URL before updating (for deletion)
+    const oldImageUrl = section === 'trusted-by' 
+      ? (existingMetadata?.logo_url || '')
+      : (existingMetadata?.image_url || '');
+    
     // If there's a new image file, upload it first
     let finalImageUrl = editValues.image_url || '';
+    
+    // If imagePreview exists and is a URL (not a data URL), use it (this handles the case where user clicked "Yükle" button)
+    // Check if imagePreview is a URL (starts with http/https) rather than a data URL
+    if (imagePreview && (imagePreview.startsWith('http://') || imagePreview.startsWith('https://'))) {
+      finalImageUrl = imagePreview;
+    }
+    
     if (imageFile) {
       const uploadResult = await handleImageUpload(id);
       if (uploadResult) {
@@ -258,15 +271,25 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
     // Start with a clean copy of existing metadata
     const metadata: Record<string, any> = existingMetadata ? { ...existingMetadata } : {};
     
+    let shouldDeleteOldImage = false;
+    
     if (section === 'leadership') {
       // Always update image_url based on finalImageUrl
       // If finalImageUrl is empty string or null/undefined, remove it from metadata
       if (finalImageUrl && finalImageUrl.trim() && finalImageUrl !== '') {
         metadata.image_url = finalImageUrl.trim();
+        // If we have a new image and an old one exists, delete the old one
+        if (oldImageUrl && oldImageUrl !== finalImageUrl) {
+          shouldDeleteOldImage = true;
+        }
       } else {
         // Explicitly remove image_url from metadata if it's empty
         if ('image_url' in metadata) {
           delete metadata.image_url;
+        }
+        // If image is being removed and old image exists, delete it from storage
+        if (oldImageUrl) {
+          shouldDeleteOldImage = true;
         }
       }
       // Update role if provided
@@ -284,11 +307,28 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
       // Check if image_url is empty (which means user wants to remove the logo)
       if (finalImageUrl && finalImageUrl.trim() && finalImageUrl !== '') {
         metadata.logo_url = finalImageUrl.trim();
+        // If we have a new logo and an old one exists, delete the old one
+        if (oldImageUrl && oldImageUrl !== finalImageUrl) {
+          shouldDeleteOldImage = true;
+        }
       } else {
         // Explicitly remove logo_url from metadata if it's empty
         if ('logo_url' in metadata) {
           delete metadata.logo_url;
         }
+        // If logo is being removed and old logo exists, delete it from storage
+        if (oldImageUrl) {
+          shouldDeleteOldImage = true;
+        }
+      }
+    }
+
+    // Delete old image from storage if needed
+    if (shouldDeleteOldImage && oldImageUrl) {
+      const deleteResult = await deleteImageFromStorage(oldImageUrl);
+      if (!deleteResult.success) {
+        console.warn('Failed to delete old image from storage:', deleteResult.error);
+        // Continue with save even if deletion fails
       }
     }
 
@@ -591,8 +631,8 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                       if (imagePreview) {
                                         // New image preview takes priority
                                         currentLogoUrl = imagePreview;
-                                      } else if (editValues.image_url !== undefined) {
-                                        // If editValues.image_url is set (even if empty), use it
+                                      } else if (editingId === content.id && editValues.image_url !== undefined) {
+                                        // If we're editing and editValues.image_url is set (even if empty), use it
                                         // This handles the case where user clicked X to remove logo
                                         currentLogoUrl = editValues.image_url;
                                       } else {
@@ -620,27 +660,44 @@ export function PageContentEditor({ section, sectionLabel, description, previewU
                                         </div>
                                       ) : null;
                                     })()}
-                                    {!imagePreview && (!editValues.image_url || editValues.image_url.trim() === '') && (!content.metadata?.logo_url || content.metadata.logo_url.trim() === '') && (
-                                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4">
-                                        <input
-                                          ref={fileInputRef}
-                                          type="file"
-                                          accept="image/*"
-                                          onChange={handleImageSelect}
-                                          className="hidden"
-                                          id={`logo-upload-${content.id}`}
-                                        />
-                                        <label
-                                          htmlFor={`logo-upload-${content.id}`}
-                                          className="flex flex-col items-center justify-center cursor-pointer"
-                                        >
-                                          <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
-                                          <span className="text-xs text-gray-600 dark:text-gray-400">
-                                            Logo Yükle (Max 2MB)
-                                          </span>
-                                        </label>
-                                      </div>
-                                    )}
+                                    {(() => {
+                                      // Show file input if there's no logo being displayed
+                                      // Check if we have a preview, edit value, or original logo
+                                      const hasImagePreview = imagePreview && imagePreview.trim() !== '';
+                                      
+                                      // If we're editing and editValues.image_url is explicitly set to empty, 
+                                      // ignore original logo (user has cleared it)
+                                      const isEditingAndCleared = editingId === content.id && editValues.image_url !== undefined && editValues.image_url.trim() === '';
+                                      const hasEditValue = editingId === content.id && editValues.image_url && editValues.image_url.trim() !== '';
+                                      
+                                      // Only check original logo if we're not editing or if user hasn't explicitly cleared it
+                                      const hasOriginalLogo = !isEditingAndCleared && !hasEditValue && content.metadata?.logo_url && content.metadata.logo_url.trim() !== '';
+                                      
+                                      // Show input if no logo is currently displayed
+                                      const shouldShowInput = !hasImagePreview && !hasEditValue && !hasOriginalLogo;
+                                      
+                                      return shouldShowInput ? (
+                                        <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4">
+                                          <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageSelect}
+                                            className="hidden"
+                                            id={`logo-upload-${content.id}`}
+                                          />
+                                          <label
+                                            htmlFor={`logo-upload-${content.id}`}
+                                            className="flex flex-col items-center justify-center cursor-pointer"
+                                          >
+                                            <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
+                                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                                              Logo Yükle (Max 2MB)
+                                            </span>
+                                          </label>
+                                        </div>
+                                      ) : null;
+                                    })()}
                                     {imageFile && !imagePreview && (
                                       <button
                                         type="button"

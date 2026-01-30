@@ -163,3 +163,41 @@ export async function uploadImage(formData: FormData, bucket: string = 'portfoli
     return { url: null, error: error.message };
   }
 }
+
+export async function deleteImageFromStorage(imageUrl: string): Promise<{ success: boolean; error: string | null }> {
+  try {
+    if (!imageUrl || !imageUrl.trim()) {
+      return { success: true, error: null }; // No URL to delete
+    }
+
+    const supabase = await createClient();
+    
+    // Parse the Supabase Storage URL to extract bucket and path
+    // URL format: https://{project-ref}.supabase.co/storage/v1/object/public/{bucket}/{path}
+    const urlPattern = /https:\/\/[^/]+\/storage\/v1\/object\/public\/([^/]+)\/(.+)/;
+    const match = imageUrl.match(urlPattern);
+    
+    if (!match) {
+      console.warn('Invalid Supabase Storage URL format:', imageUrl);
+      return { success: false, error: 'Invalid image URL format' };
+    }
+
+    const bucket = match[1];
+    const filePath = match[2];
+
+    // Delete the file from storage
+    const { error } = await supabase.storage
+      .from(bucket)
+      .remove([filePath]);
+
+    if (error) {
+      console.error('Error deleting image from storage:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Exception deleting image from storage:', error);
+    return { success: false, error: error.message };
+  }
+}

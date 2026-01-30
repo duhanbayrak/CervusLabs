@@ -27,12 +27,12 @@ export function TrustedBySection() {
           setLoading(false);
           return;
         }
-        
+
         if (data && Array.isArray(data) && data.length > 0) {
           const companiesData: Company[] = [];
           // Find all company entries dynamically
           const companyEntries = data.filter(c => c.content_key && c.content_key.match(/^company\d+_name$/));
-          
+
           if (companyEntries.length > 0) {
             // Sort by order_index or by number in content_key
             companyEntries.sort((a, b) => {
@@ -47,7 +47,7 @@ export function TrustedBySection() {
               const bNum = bMatch ? parseInt(bMatch[1]) : 0;
               return aNum - bNum;
             });
-            
+
             companyEntries.forEach((nameContent) => {
               const name = locale === 'tr' ? (nameContent.value_tr || nameContent.value_en || '') : (nameContent.value_en || '');
               const logo_url = nameContent.metadata?.logo_url || '';
@@ -57,7 +57,7 @@ export function TrustedBySection() {
               }
             });
           }
-          
+
           setCompanies(companiesData);
         } else {
           setCompanies([]);
@@ -90,33 +90,32 @@ export function TrustedBySection() {
               Henüz şirket eklenmemiş.
             </div>
           ) : (
-            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all">
+            <div className="flex flex-wrap justify-center items-start gap-x-12 gap-y-16 md:gap-x-24">
               {companies.map((company, index) => (
                 <div
                   key={`${company.name}-${index}`}
-                  className="flex items-center justify-center h-12 max-w-[200px]"
+                  className="group flex flex-col items-center gap-4"
                 >
-                  {company.logo_url && company.logo_url.trim() ? (
-                    <img
-                      src={company.logo_url}
-                      alt={company.name}
-                      className="max-h-12 max-w-full object-contain filter brightness-0 invert opacity-80 hover:opacity-100 transition-opacity"
-                      onError={(e) => {
-                        // If image fails to load, show company name instead
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          const fallback = document.createElement('span');
-                          fallback.className = 'text-white/50 text-sm font-medium';
-                          fallback.textContent = company.name;
-                          parent.appendChild(fallback);
-                        }
-                      }}
-                    />
-                  ) : (
-                    <span className="text-white/50 text-sm font-medium">{company.name}</span>
-                  )}
+                  <div className="h-20 flex items-center justify-center px-4 w-full">
+                    {company.logo_url && company.logo_url.trim() ? (
+                      <img
+                        src={company.logo_url}
+                        alt={company.name}
+                        className="max-h-20 w-auto object-contain opacity-60 group-hover:opacity-100 transition-all duration-300 grayscale group-hover:grayscale-0"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="h-20 w-20 rounded bg-white/5 flex items-center justify-center">
+                        <span className="text-xs text-white/20 uppercase">Logo</span>
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-lg font-medium text-gray-500 group-hover:text-white transition-colors text-center max-w-[200px]">
+                    {company.name}
+                  </span>
                 </div>
               ))}
             </div>

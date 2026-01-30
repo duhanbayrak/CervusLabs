@@ -96,14 +96,15 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
             </p>
           </div>
           <div className="flex gap-3 items-center">
-            <LanguageSwitcher />
             <button
               onClick={handleSignOut}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-white border border-gray-300 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-primary transition-colors flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 border border-transparent rounded-lg shadow-sm transition-colors flex items-center gap-2 z-10"
+              title={t?.admin?.dashboard?.signOut || "Sign Out"}
             >
               <LogOut className="w-4 h-4" />
-              {t.admin.dashboard.signOut}
+              <span>{t?.admin?.dashboard?.signOut || "Sign Out"}</span>
             </button>
+            <LanguageSwitcher />
             {activeTab === 'projects' && (
               <button
                 onClick={() => {
@@ -125,11 +126,10 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
             <button
               onClick={() => setActiveTab('projects')}
               type="button"
-              className={`flex-1 px-6 py-4 text-base font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
-                activeTab === 'projects'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
+              className={`flex-1 px-6 py-4 text-base font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === 'projects'
+                ? 'bg-primary text-white shadow-lg'
+                : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
             >
               <Folder className="w-5 h-5" />
               <span>Projects</span>
@@ -137,11 +137,10 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
             <button
               onClick={() => setActiveTab('content')}
               type="button"
-              className={`flex-1 px-6 py-4 text-base font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
-                activeTab === 'content'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
+              className={`flex-1 px-6 py-4 text-base font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === 'content'
+                ? 'bg-primary text-white shadow-lg'
+                : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
             >
               <FileText className="w-5 h-5" />
               <span>Page Content</span>
@@ -159,143 +158,143 @@ export function AdminDashboard({ initialProjects, error: initialError }: AdminDa
         {/* Content based on active tab */}
         {activeTab === 'projects' ? (
           <div className="glass bg-card-light dark:bg-card-dark border border-white/40 dark:border-white/5 rounded-xl overflow-hidden">
-          {loading ? (
-            <div className="p-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">{t.admin.dashboard.loading}</p>
-            </div>
-          ) : projects.length === 0 ? (
-            <div className="p-12 text-center">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">{t.admin.dashboard.noProjects}</p>
-              <button
-                onClick={() => {
-                  setEditingProject(null);
-                  setShowForm(true);
-                }}
-                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
-              >
-                {t.admin.dashboard.addFirstProject}
-              </button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t.admin.dashboard.project}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t.admin.dashboard.category}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t.admin.dashboard.year}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t.admin.dashboard.slug}
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t.admin.dashboard.actions}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-                  {projects.map((project) => (
-                    <tr
-                      key={project.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          {project.image_url && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={project.image_url}
-                              alt={project.image_alt || project.title}
-                              className="w-12 h-12 object-cover rounded"
-                            />
-                          )}
-                          <div>
-                            <div className="text-sm font-medium text-primary dark:text-white">
-                              {project.title}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 max-w-xs">
-                              {project.description}
+            {loading ? (
+              <div className="p-12 text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary mb-4" />
+                <p className="text-gray-600 dark:text-gray-400">{t.admin.dashboard.loading}</p>
+              </div>
+            ) : projects.length === 0 ? (
+              <div className="p-12 text-center">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{t.admin.dashboard.noProjects}</p>
+                <button
+                  onClick={() => {
+                    setEditingProject(null);
+                    setShowForm(true);
+                  }}
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                >
+                  {t.admin.dashboard.addFirstProject}
+                </button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        {t.admin.dashboard.project}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        {t.admin.dashboard.category}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        {t.admin.dashboard.year}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        {t.admin.dashboard.slug}
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        {t.admin.dashboard.actions}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                    {projects.map((project) => (
+                      <tr
+                        key={project.id}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            {project.image_url && (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={project.image_url}
+                                alt={project.image_alt || project.title}
+                                className="w-12 h-12 object-cover rounded"
+                              />
+                            )}
+                            <div>
+                              <div className="text-sm font-medium text-primary dark:text-white">
+                                {project.title}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 max-w-xs">
+                                {project.description}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-xs font-mono text-primary dark:text-white bg-white dark:bg-white/10 px-2 py-1 rounded">
-                          {project.category}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                        {project.year}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 font-mono">
-                        {project.slug}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleEdit(project)}
-                            className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors"
-                            title={t.admin.dashboard.edit}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(project.id)}
-                            disabled={deletingId === project.id}
-                            className="p-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors disabled:opacity-50"
-                            title={t.admin.dashboard.delete}
-                          >
-                            {deletingId === project.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="w-4 h-4" />
-                            )}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-xs font-mono text-primary dark:text-white bg-white dark:bg-white/10 px-2 py-1 rounded">
+                            {project.category}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                          {project.year}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 font-mono">
+                          {project.slug}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleEdit(project)}
+                              className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors"
+                              title={t.admin.dashboard.edit}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(project.id)}
+                              disabled={deletingId === project.id}
+                              className="p-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors disabled:opacity-50"
+                              title={t.admin.dashboard.delete}
+                            >
+                              {deletingId === project.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="glass bg-card-light dark:bg-card-dark border border-white/40 dark:border-white/5 rounded-xl p-6">
             <div className="space-y-8">
-              <PageContentEditor 
-                section="stats" 
-                sectionLabel="İstatistikler (Stats)" 
+              <PageContentEditor
+                section="stats"
+                sectionLabel="İstatistikler (Stats)"
                 description="Ana sayfadaki istatistik bölümünü düzenleyin. Her istatistik için değer ve etiket girin."
                 previewUrl="/"
               />
-              <PageContentEditor 
-                section="services" 
-                sectionLabel="Hizmetler (Services)" 
+              <PageContentEditor
+                section="services"
+                sectionLabel="Hizmetler (Services)"
                 description="Ana sayfa ve Services sayfasındaki hizmetler bölümünü düzenleyin."
                 previewUrl="/services"
               />
-              <PageContentEditor 
-                section="leadership" 
-                sectionLabel="Liderlik Ekibi (Leadership)" 
+              <PageContentEditor
+                section="leadership"
+                sectionLabel="Liderlik Ekibi (Leadership)"
                 description="About sayfasındaki liderlik ekibi bölümünü düzenleyin. Her lider için isim ve rol girin."
                 previewUrl="/about"
               />
-              <PageContentEditor 
-                section="values" 
-                sectionLabel="Değerler (Values)" 
+              <PageContentEditor
+                section="values"
+                sectionLabel="Değerler (Values)"
                 description="About sayfasındaki değerler bölümünü düzenleyin."
                 previewUrl="/about"
               />
-              <PageContentEditor 
-                section="trusted-by" 
-                sectionLabel="Güvenilen Şirketler (Trusted By)" 
+              <PageContentEditor
+                section="trusted-by"
+                sectionLabel="Güvenilen Şirketler (Trusted By)"
                 description="About sayfasındaki 'Güvenilen Şirketler' bölümünü düzenleyin. Şirket isimleri ve logolarını ekleyin."
                 previewUrl="/about"
               />
