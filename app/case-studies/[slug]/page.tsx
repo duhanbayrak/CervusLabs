@@ -6,24 +6,14 @@ import { ProjectDetailContent } from "@/components/case-studies/project-detail-c
 import { notFound } from "next/navigation";
 import { getProjects } from "@/app/actions/projects";
 
+export const dynamic = 'force-dynamic';
+
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  const { data: projects } = await getProjects();
-  
-  if (!projects) {
-    return [];
-  }
-
-  return projects.map((project) => ({
-    slug: project.slug,
-  }));
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const { data: projects } = await getProjects();
   const project = projects?.find((p) => p.slug === slug);
 
@@ -40,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
-  const { slug } = params;
+  const { slug } = await params;
   const { data: projects } = await getProjects();
   const project = projects?.find((p) => p.slug === slug);
 
